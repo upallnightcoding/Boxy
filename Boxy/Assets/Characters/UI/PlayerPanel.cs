@@ -7,8 +7,6 @@ public class PlayerPanel : MonoBehaviour
 {
     [SerializeField] private GameObject twoPlayerContainer;
     [SerializeField] private GameData gameData;
-    [SerializeField] private TMP_InputField player1Name;
-    [SerializeField] private TMP_InputField player2Name;
     [SerializeField] private GamePlayPanel gamePlayPanel;
 
     // Start is called before the first frame update
@@ -19,12 +17,19 @@ public class PlayerPanel : MonoBehaviour
 
     public void StartGame()
     {
-        gameData.Player1Name = player1Name.text;
-        gameData.Player2Name = player2Name.text;
-
         gameObject.SetActive(false);
 
         gamePlayPanel.StartGamePlay();
+    }
+
+    public void OnPlayer1Name(string value)
+    {
+        gameData.Player1Name = value;
+    }
+
+    public void OnPlayer2Name(string value)
+    {
+        gameData.Player2Name = value;
     }
 
     public void OnePlayerGame()
