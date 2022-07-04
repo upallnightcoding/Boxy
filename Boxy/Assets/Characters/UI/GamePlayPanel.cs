@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using System;
 
 public class GamePlayPanel : MonoBehaviour
 {
     // Class Constants
     private const int LEFT_MOUSE_BUTTON = 0;
     private const float PEG_LINK_WIDTH = 0.089f;
-    private Color PLAYER1_COLOR = Color.white;
-    private Color PLAYER2_COLOR = Color.black;
 
     // Inspector Fields
     [SerializeField] private Transform cameraPos;
@@ -20,6 +20,12 @@ public class GamePlayPanel : MonoBehaviour
     [SerializeField] private GameObject player1PreFab;
     [SerializeField] private GameObject player2PreFab;
 
+    [SerializeField] private TMP_Text player1NameDisplay;
+    [SerializeField] private TMP_Text player2NameDisplay;
+
+    [SerializeField] private TMP_Text player1Score;
+    [SerializeField] private TMP_Text player2Score;
+
     // Player Names
     private string player1Name = null;
     private string player2Name = null;
@@ -28,7 +34,7 @@ public class GamePlayPanel : MonoBehaviour
 
     // Initial Game State
     private GameState gameState = GameState.IDLE;
-    private SelectionState selection = SelectionState.ANCHOR;
+    private SelectionState selectionState = SelectionState.ANCHOR;
 
     // List of Objects Collected for Later Deletions
     private List<GameObject> listOfGameObjects = new List<GameObject>();
@@ -40,6 +46,14 @@ public class GamePlayPanel : MonoBehaviour
     private Wall[,] wall;
 
     private Peg pegStart;
+
+    private TMP_Text GetScore => (gameState == GameState.PLAYER1) ? player1Score : player2Score;
+    private GameObject GetPlayer => (gameState == GameState.PLAYER1) ? player1PreFab : player2PreFab;
+
+    private Color GetPlayerColor 
+    {
+        get { return(GetPlayer.GetComponent<SpriteRenderer>().color); }
+    }
 
     void Update()
     {
@@ -53,33 +67,33 @@ public class GamePlayPanel : MonoBehaviour
             case GameState.IDLE:
                 break;
             case GameState.PLAYER1:
-                MakeMove(PLAYER1_COLOR, player1PreFab);
+                MakeMove();
                 break;
             case GameState.PLAYER2:
-                MakeMove(PLAYER2_COLOR, player2PreFab);
+                MakeMove();
                 break;
             case GameState.STOP:
                 break;
         }
     }
 
-    private void MakeMove(Color playerColor, GameObject square)
+    private void MakeMove()
     {
-        switch (selection)
+        switch (selectionState)
         {
             case SelectionState.ANCHOR:
-                selection = SelectAnchorPeg();
+                selectionState = SelectAnchorPeg();
                 break;
             case SelectionState.PIN:
-                selection = SelectPinPeg(playerColor, square);
+                selectionState = SelectPinPeg(GetPlayerColor);
 
-                switch(selection)
+                switch(selectionState)
                 {
                     case SelectionState.ANCHOR:
                         TogglePlayer();
                         break;
                     case SelectionState.CANCEL:
-                        selection = SelectionState.ANCHOR;
+                        selectionState = SelectionState.ANCHOR;
                         break;
                 }
 
@@ -115,7 +129,7 @@ public class GamePlayPanel : MonoBehaviour
         return (selection);
     }
 
-    private SelectionState SelectPinPeg(Color playerColor, GameObject square)
+    private SelectionState SelectPinPeg(Color playerColor)
     {
         SelectionState state = SelectionState.PIN;
 
@@ -136,7 +150,7 @@ public class GamePlayPanel : MonoBehaviour
 
                     CreatePegLink(pegStart, peg, playerColor);
                     LinkPegs(pegStart, peg);
-                    UpDateBoxSideCount(pegStart, peg, square);
+                    UpDateBoxSideCount(pegStart, peg);
 
                     pegStart.Reset();
                     peg.Reset();
@@ -171,6 +185,9 @@ public class GamePlayPanel : MonoBehaviour
                 {
                     peg.Illegal();
                     //AudioManager.Instance.SoundIllegalMove();
+                } else
+                {
+                    peg.Reset();
                 }
             }
         }
@@ -178,15 +195,15 @@ public class GamePlayPanel : MonoBehaviour
         return (state);
     }
 
-    private void UpDateBoxSideCount(Peg pegStart, Peg pegEnd, GameObject square)
+    private void UpDateBoxSideCount(Peg pegStart, Peg pegEnd)
     {
         if (pegStart.Y == pegEnd.Y)
         {
             int col = Mathf.Min((int)pegStart.X, (int)pegEnd.X);
             int row = (int)pegStart.Y;
 
-            AddOneToBoxSideCount(col, row, square);
-            AddOneToBoxSideCount(col, row - 1, square);
+            AddOneToBoxSideCount(col, row);
+            AddOneToBoxSideCount(col, row - 1);
         }
 
         if (pegStart.X == pegEnd.X)
@@ -194,12 +211,12 @@ public class GamePlayPanel : MonoBehaviour
             int col = (int)pegStart.X;
             int row = Mathf.Min((int)pegStart.Y, (int)pegEnd.Y);
 
-            AddOneToBoxSideCount(col, row, square);
-            AddOneToBoxSideCount(col - 1, row, square);
+            AddOneToBoxSideCount(col, row);
+            AddOneToBoxSideCount(col - 1, row);
         }
     }
 
-    private void AddOneToBoxSideCount(int col, int row, GameObject square)
+    private void AddOneToBoxSideCount(int col, int row)
     {
         if ((col >= 0) && (row >= 0) && (col < boardSize - 1) && (row < boardSize - 1))
         {
@@ -207,7 +224,11 @@ public class GamePlayPanel : MonoBehaviour
             {
                 Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
 
+                GameObject square = (gameState == GameState.PLAYER1) ? player1PreFab : player2PreFab;
+
                 GameObject go = Instantiate(square, position, Quaternion.identity);
+
+                UpdateScore();
 
                 listOfGameObjects.Add(go);
 
@@ -215,6 +236,24 @@ public class GamePlayPanel : MonoBehaviour
             }
         }
 
+    }
+
+    private void UpdateScore()
+    {
+        int score = -1;
+
+        try
+        {
+            //TMP_Text scoreTxt = (gameState == GameState.PLAYER1) ? player1Score : player2Score;
+            TMP_Text scoreTxt = GetScore;
+            score = System.Int32.Parse(scoreTxt.text);
+            score += 1;
+            scoreTxt.text = score.ToString();
+        }
+        catch (FormatException)
+        {
+            score = -1;
+        }
     }
 
     private bool LegalMove(Peg pegStart, Peg pegEnd)
@@ -309,12 +348,17 @@ public class GamePlayPanel : MonoBehaviour
         player2Name = gameData.Player2Name;
         boardSize = gameData.BoardSize;
 
+        player1NameDisplay.text = player1Name;
+        player2NameDisplay.text = player2Name;
+
+        wall = new Wall[boardSize - 1, boardSize - 1];
+
         Debug.Log($"Player 1: {player1Name} Player 2: {player2Name}");
 
         DrawGameBoard();
 
         gameState = GameState.PLAYER1;
-        selection = SelectionState.ANCHOR;
+        selectionState = SelectionState.ANCHOR;
     }
 
     public void EndGamePlay()
@@ -350,6 +394,14 @@ public class GamePlayPanel : MonoBehaviour
             for (int col = 0; col < boardSize; col++)
             {
                 CreatePeg(col, row);
+            }
+        }
+
+        for (int row = 0; row < boardSize - 1; row++)
+        {
+            for (int col = 0; col < boardSize - 1; col++)
+            {
+                wall[col, row] = new Wall();
             }
         }
 

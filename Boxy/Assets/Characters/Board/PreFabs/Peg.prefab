@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7813621721354263487}
   - component: {fileID: -2784573002311257517}
   - component: {fileID: 6675400273394848814}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Peg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70,8 +70,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1212577187
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 760ff8254ab250340ae65d50ac1fe871, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
