@@ -26,6 +26,9 @@ public class GamePlayPanel : MonoBehaviour
     [SerializeField] private TMP_Text player1Score;
     [SerializeField] private TMP_Text player2Score;
 
+    [SerializeField] GameObject backGround1;
+    [SerializeField] GameObject backGround2;
+
     // Player Names
     private string player1Name = null;
     private string player2Name = null;
@@ -405,8 +408,15 @@ public class GamePlayPanel : MonoBehaviour
             }
         }
 
+        Vector3 oldCameraPosition = cameraPos.transform.position;
+
         float position = (boardSize - 1.0f) / 2.0f;
         cameraPos.transform.position = new Vector3(position, position, -10.0f);
+
+        Vector3 delta = cameraPos.transform.position;
+
+        backGround1.transform.position = new Vector3(delta.x, delta.y, 0.0f);
+        backGround2.transform.position = new Vector3(delta.x, delta.y + 9.96f, 0.0f);
     }
 
     private void CreatePeg(int col, int row)

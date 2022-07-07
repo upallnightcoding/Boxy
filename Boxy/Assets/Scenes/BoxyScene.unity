@@ -1410,6 +1410,8 @@ MonoBehaviour:
   player2NameDisplay: {fileID: 1433836992}
   player1Score: {fileID: 876509327}
   player2Score: {fileID: 1151910283}
+  backGround1: {fileID: 985067708}
+  backGround2: {fileID: 872204219}
 --- !u!120 &373515595
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -2790,7 +2792,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 872204219}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 9.97, z: 10}
+  m_LocalPosition: {x: 0, y: 9.969971, z: 10}
   m_LocalScale: {x: 0.975, y: 1.1, z: 1}
   m_Children: []
   m_Father: {fileID: 519420032}
@@ -2808,6 +2810,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06122c1f98eba68429d0d76c171ba307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aCamera: {fileID: 519420031}
 --- !u!212 &872204222
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3350,7 +3353,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985067708}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -0, y: 0, z: 10}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
   m_LocalScale: {x: 0.975, y: 1.1, z: 1}
   m_Children: []
   m_Father: {fileID: 519420032}
@@ -3368,6 +3371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06122c1f98eba68429d0d76c171ba307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aCamera: {fileID: 519420031}
 --- !u!1 &1062299216
 GameObject:
   m_ObjectHideFlags: 0
@@ -5740,7 +5744,7 @@ GameObject:
   - component: {fileID: 1900157757}
   - component: {fileID: 1900157756}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: Rules
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5785,7 +5789,23 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Place the rules text here.
+  m_text: 'Each player takes one turn with the option of passing.
+
+
+    Links are
+    made between pegs, either horizontally or vertically, just click and drag.
+
+
+    The
+    last player to draw a link that forms a box receives one point.
+
+
+    When all
+    of the pegs have been linked the game is over.
+
+
+    The player with the most
+    points at the end of the game wins.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ef8219c25e46a7442b83a2b49c9a100a, type: 2}
   m_sharedMaterial: {fileID: 3936773736407537513, guid: ef8219c25e46a7442b83a2b49c9a100a, type: 2}
@@ -5812,8 +5832,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 80
-  m_fontSizeBase: 80
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5848,7 +5868,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: -2.867981}
+  m_margin: {x: 0, y: -125.121826, z: 0, w: -166.9624}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
