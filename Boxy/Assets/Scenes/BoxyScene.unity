@@ -3043,7 +3043,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
@@ -3052,7 +3052,7 @@ PrefabInstance:
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 373515592}
+      objectReference: {fileID: 373515594}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
@@ -3067,7 +3067,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SetActive
+      value: StopGamePlay
       objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
@@ -3075,7 +3075,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: GamePlayPanel, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
@@ -4772,10 +4772,11 @@ MonoBehaviour:
   drawLineMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   lineRenderer: {fileID: 1533695524}
   pegPreFab: {fileID: 8509672107575846104, guid: 0b28b96bf12510e48a2e4c62efc10c72, type: 3}
-  player1PreFab: {fileID: 3687205964819395846, guid: cb336362857dd4c4db76ec10a0b301bb, type: 3}
-  player2PreFab: {fileID: 7039796178990604985, guid: aac7ec203c390484286c6fb3de607943, type: 3}
+  squareBlackPreFab: {fileID: 3687205964819395846, guid: cb336362857dd4c4db76ec10a0b301bb, type: 3}
+  squareWhitePreFab: {fileID: 7039796178990604985, guid: aac7ec203c390484286c6fb3de607943, type: 3}
   backGround1: {fileID: 985067708}
   backGround2: {fileID: 872204219}
+  gamePlayPanel: {fileID: 373515592}
 --- !u!224 &1614032562 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1427531142227220483, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}

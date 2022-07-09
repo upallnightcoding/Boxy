@@ -17,10 +17,6 @@ public class GamePlayPanel : MonoBehaviour
 
     [SerializeField] private GameObject gamePlayObject;
 
-    // Player Names
-    private string player1Name = null;
-    private string player2Name = null;
-
     private void Start()
     {
         
@@ -31,29 +27,37 @@ public class GamePlayPanel : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// StartGamePlay() - Start the game play by setting the UI components with
+    /// the player's names.  The actual game play code is started by the UI
+    /// seperating the UI and game play logic.
+    /// </summary>
     public void StartGamePlay()
     {
         gameObject.SetActive(true);
 
-        player1Name = gameData.Player1Name;
-        player2Name = gameData.Player2Name;
-
-        player1NameDisplay.text = player1Name;
-        player2NameDisplay.text = player2Name;
+        player1NameDisplay.text = gameData.Player1Name;
+        player2NameDisplay.text = gameData.Player2Name;
 
         gamePlayObject.GetComponent<GamePlay>().StartGamePlay();
     }
 
-    private void UpdateScore()
+    public void StopGamePlay()
+    {
+        gamePlayObject.GetComponent<GamePlay>().StopGamePlay();
+
+        gameObject.SetActive(false);
+    }
+
+    public void UpdateScore(GameState gameState)
     {
         int score = -1;
 
         try
         {
-            //TMP_Text scoreTxt = GetScore;
-            //score = System.Int32.Parse(scoreTxt.text);
-            //score += 1;
-            //scoreTxt.text = score.ToString();
+            TMP_Text scoreTxt = (gameState == GameState.PLAYER1) ? player1Score : player2Score;
+            score = System.Int32.Parse(scoreTxt.text) + 1;
+            scoreTxt.text = score.ToString();
         }
         catch (FormatException)
         {

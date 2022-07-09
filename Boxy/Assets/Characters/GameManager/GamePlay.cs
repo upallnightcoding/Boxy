@@ -14,11 +14,13 @@ public class GamePlay : MonoBehaviour
     [SerializeField] private LineRenderer lineRenderer;
 
     [SerializeField] private GameObject pegPreFab;
-    [SerializeField] private GameObject player1PreFab;
-    [SerializeField] private GameObject player2PreFab;
+    [SerializeField] private GameObject squareBlackPreFab;
+    [SerializeField] private GameObject squareWhitePreFab;
 
     [SerializeField] GameObject backGround1;
     [SerializeField] GameObject backGround2;
+
+    [SerializeField] GameObject gamePlayPanel;
 
     private int boardSize;
 
@@ -36,7 +38,7 @@ public class GamePlay : MonoBehaviour
 
     private List<GameObject> listOfGameObjects = new List<GameObject>();
 
-    private GameObject GetPlayer => (gameState == GameState.PLAYER1) ? player1PreFab : player2PreFab;
+    private GameObject GetPlayer => (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
     private Color GetPlayerColor
     {
@@ -72,8 +74,6 @@ public class GamePlay : MonoBehaviour
 
     public void StartGamePlay()
     {
-        //gameObject.SetActive(true);
-
         boardSize = gameData.BoardSize;
 
         wall = new Wall[boardSize - 1, boardSize - 1];
@@ -84,12 +84,20 @@ public class GamePlay : MonoBehaviour
         selectionState = SelectionState.ANCHOR;
     }
 
+    public void StopGamePlay()
+    {
+        foreach (GameObject go in listOfGameObjects)
+        {
+            Destroy(go);
+        }
+    }
+
     private void MakeMove()
     {
         switch (selectionState)
         {
             case SelectionState.ANCHOR:
-                selectionState = SelectAnchorPeg();
+                selectionState = SelectAnchorPeg(GetPlayerColor);
                 break;
             case SelectionState.PIN:
                 selectionState = SelectPinPeg(GetPlayerColor);
@@ -108,7 +116,7 @@ public class GamePlay : MonoBehaviour
         }
     }
 
-    private SelectionState SelectAnchorPeg()
+    private SelectionState SelectAnchorPeg(Color playerColor)
     {
         SelectionState selection = SelectionState.ANCHOR;
 
@@ -129,6 +137,9 @@ public class GamePlay : MonoBehaviour
                     pegStart = peg;
 
                     selection = SelectionState.PIN;
+
+                    lineRenderer.startColor = playerColor;
+                    lineRenderer.endColor = playerColor;
                 }
             }
         }
@@ -232,11 +243,11 @@ public class GamePlay : MonoBehaviour
             {
                 Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
 
-                GameObject square = (gameState == GameState.PLAYER1) ? player1PreFab : player2PreFab;
+                GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
                 GameObject go = Instantiate(square, position, Quaternion.identity);
 
-                //UpdateScore();
+                UpdateScore(gameState);
 
                 listOfGameObjects.Add(go);
 
@@ -244,6 +255,11 @@ public class GamePlay : MonoBehaviour
             }
         }
 
+    }
+
+    private void UpdateScore(GameState gameState)
+    {
+        gamePlayPanel.GetComponent<GamePlayPanel>().UpdateScore(gameState);
     }
 
     private bool LegalMove(Peg pegStart, Peg pegEnd)
