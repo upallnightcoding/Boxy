@@ -54,14 +54,7 @@ public class Peg : MonoBehaviour
 
     public void Reset()
     {
-        if (IsOpen())
-        {
-            spriteRenderer.sprite = pegOpen;
-        }
-        else
-        {
-            spriteRenderer.sprite = pegClosed;
-        }
+        spriteRenderer.sprite = IsOpen() ? pegOpen : pegClosed;
     }
 
     public void Illegal()

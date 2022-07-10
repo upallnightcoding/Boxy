@@ -432,12 +432,12 @@ public class Wall
 
 public enum GameState
 {
-    IDLE,
-    PLAYER1,
-    PLAYER2,
-    WON,
-    RESIGN,
-    STOP
+    PLAYER1 = 0,    // This enumeration must be "0"
+    PLAYER2 = 1,    // This enumeration must be "1"
+    IDLE = 2,
+    WON = 3,
+    RESIGN = 4,
+    STOP = 5
 }
 
 public enum SelectionState

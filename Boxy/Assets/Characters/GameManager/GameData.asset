@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e2d3b0f57cf0164b8efa674842107dd, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  Player1Name: q1
-  Player2Name: q2
-  BoardSize: 5
+  Player1Name: hh
+  Player2Name: bb
+  BoardSize: 3

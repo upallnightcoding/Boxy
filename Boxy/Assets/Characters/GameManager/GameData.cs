@@ -17,6 +17,6 @@ public class GameData : ScriptableObject
         Player1Name = "Player1";
         Player2Name = "Player2";
 
-        BoardSize = 5;
+        BoardSize = 3;
     }
 }

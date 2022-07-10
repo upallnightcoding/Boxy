@@ -15,17 +15,17 @@ public class GamePlayPanel : MonoBehaviour
     [SerializeField] private TMP_Text player1Score;
     [SerializeField] private TMP_Text player2Score;
 
-    [SerializeField] private GameObject gamePlayObject;
+    [SerializeField] private GameObject gameManager;
 
-    private void Start()
-    {
-        
-    }
+    [SerializeField] private GameObject winPanel;
+    [SerializeField] private TMP_Text winPanelName;
+    [SerializeField] private TMP_Text message;
 
-    void Update()
-    {
-        
-    }
+    private int squareCount = 0;
+    private int boardSize = 0;
+    private int totalSquareCount = 0;
+
+    private PlayerUI[] playerUI = null;
 
     /// <summary>
     /// StartGamePlay() - Start the game play by setting the UI components with
@@ -36,33 +36,87 @@ public class GamePlayPanel : MonoBehaviour
     {
         gameObject.SetActive(true);
 
-        player1NameDisplay.text = gameData.Player1Name;
-        player2NameDisplay.text = gameData.Player2Name;
+        boardSize = gameData.BoardSize;
+        totalSquareCount = (boardSize - 1) * (boardSize - 1);
 
-        gamePlayObject.GetComponent<GamePlay>().StartGamePlay();
+        playerUI = new PlayerUI[2];
+        playerUI[(int)GameState.PLAYER1] = new PlayerUI(player1NameDisplay, player1Score, gameData.Player1Name);
+        playerUI[(int)GameState.PLAYER2] = new PlayerUI(player2NameDisplay, player2Score, gameData.Player2Name);
+
+        gameManager.GetComponent<GamePlay>().StartGamePlay();
     }
 
+    /// <summary>
+    /// StopGamePlay() - 
+    /// </summary>
     public void StopGamePlay()
     {
-        gamePlayObject.GetComponent<GamePlay>().StopGamePlay();
+        gameManager.GetComponent<GamePlay>().StopGamePlay();
 
         gameObject.SetActive(false);
     }
 
     public void UpdateScore(GameState gameState)
     {
-        int score = -1;
+        playerUI[(int) gameState].IncScore();
 
-        try
+        IsGameOver(gameState);
+    }
+
+    public void CloseWinnerPanel()
+    {
+        winPanel.SetActive(false);
+
+        StopGamePlay();
+    }
+
+    private void IsGameOver(GameState lastPlayerToMove)
+    {
+        if (++squareCount == totalSquareCount)
         {
-            TMP_Text scoreTxt = (gameState == GameState.PLAYER1) ? player1Score : player2Score;
-            score = System.Int32.Parse(scoreTxt.text) + 1;
-            scoreTxt.text = score.ToString();
+            message.text = "You Won";
+
+            if (playerUI[0].Score > playerUI[1].Score)
+            {
+                winPanelName.text = playerUI[0].PlayerName();
+            } else if (playerUI[0].Score < playerUI[1].Score)
+            {
+                winPanelName.text = playerUI[1].PlayerName();
+            } else
+            {
+                winPanelName.text = "";
+                message.text = "You Tied";
+            }
+
+            winPanel.SetActive(true);
         }
-        catch (FormatException)
-        {
-            score = -1;
-        }
+    }
+}
+
+public class PlayerUI
+{
+    public int Score { get; private set; } = 0;
+
+    private readonly TMP_Text displayName;
+    private readonly TMP_Text displayScore;
+
+    public PlayerUI(TMP_Text displayName, TMP_Text displayScore, string name)
+    {
+        this.displayName = displayName;
+        this.displayScore = displayScore;
+
+        this.displayName.text = name;
+    }
+
+    public void IncScore()
+    {
+        Score++;
+        displayScore.text = Score.ToString();
+    }
+
+    public string PlayerName()
+    {
+        return (displayName.text);
     }
 }
 
