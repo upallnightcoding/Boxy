@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class BackGroundScrolling : MonoBehaviour
 {
     [SerializeField] Camera aCamera;
+
     private float speed = 0.75f;
     private float rePosition = 9.97f;
 

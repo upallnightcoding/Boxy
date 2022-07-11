@@ -10,13 +10,11 @@ public class GameData : ScriptableObject
     public string Player2Name = null;
 
     [Header("Game Variables")]
-    public int BoardSize;
+    public int BoardSize = 3;
 
     public void Initialize()
     {
         Player1Name = "Player1";
         Player2Name = "Player2";
-
-        BoardSize = 3;
     }
 }
