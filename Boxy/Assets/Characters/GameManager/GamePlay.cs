@@ -30,6 +30,8 @@ public class GamePlay : MonoBehaviour
 
     private Wall[,] wall;
 
+    private Peg illegalPeg = null;
+
     private Peg pegStart;
 
     // Initial Game State
@@ -90,6 +92,11 @@ public class GamePlay : MonoBehaviour
         {
             Destroy(go);
         }
+    }
+
+    public void SaveGameData()
+    {
+
     }
 
     private void MakeMove()
@@ -202,12 +209,14 @@ public class GamePlay : MonoBehaviour
                 if (!LegalMove(pegStart, peg))
                 {
                     peg.Illegal();
+
+                    illegalPeg = peg;
                     //AudioManager.Instance.SoundIllegalMove();
                 }
-                else
-                {
-                    peg.Reset();
-                }
+            } else
+            {
+                illegalPeg?.Reset();
+                illegalPeg = null;
             }
         }
 

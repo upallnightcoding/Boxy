@@ -15,7 +15,7 @@ public class GamePlayPanel : MonoBehaviour
     [SerializeField] private TMP_Text player1Score;
     [SerializeField] private TMP_Text player2Score;
 
-    [SerializeField] private GameObject gameManager;
+    [SerializeField] private GamePlay gamePlay;
 
     [SerializeField] private GameObject winPanel;
     [SerializeField] private TMP_Text winPanelName;
@@ -43,7 +43,7 @@ public class GamePlayPanel : MonoBehaviour
         playerUI[(int)GameState.PLAYER1] = new PlayerUI(player1NameDisplay, player1Score, gameData.Player1Name);
         playerUI[(int)GameState.PLAYER2] = new PlayerUI(player2NameDisplay, player2Score, gameData.Player2Name);
 
-        gameManager.GetComponent<GamePlay>().StartGamePlay();
+        gamePlay.StartGamePlay();
     }
 
     /// <summary>
@@ -51,9 +51,21 @@ public class GamePlayPanel : MonoBehaviour
     /// </summary>
     public void StopGamePlay()
     {
-        gameManager.GetComponent<GamePlay>().StopGamePlay();
+        gamePlay.StopGamePlay();
 
         gameObject.SetActive(false);
+    }
+
+    public void SaveGamePlay()
+    {
+        SaveGameData();
+
+        StopGamePlay();
+    }
+
+    private void SaveGameData()
+    {
+
     }
 
     public void UpdateScore(GameState gameState)
