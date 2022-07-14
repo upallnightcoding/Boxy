@@ -47,12 +47,6 @@ public class GamePlay : MonoBehaviour
         get { return (GetPlayer.GetComponent<SpriteRenderer>().color); }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -94,9 +88,33 @@ public class GamePlay : MonoBehaviour
         }
     }
 
-    public void SaveGameData()
+    /// <summary>
+    /// SaveGameData() - Saves the game state to be loaded later.  Data that
+    /// needs to be saved included the size of the board, the squares that 
+    /// have been set to black or white and all links.
+    /// </summary>
+    /// <param name="saveLoadData"></param>
+    public void SaveGameData(SaveLoadData saveLoadData)
     {
+        string squares = "";
 
+        saveLoadData.boardSize = boardSize;
+
+        // Save the squares that have been set to black or white
+        for (int row = 0; row < boardSize - 1; row++)
+        {
+            for (int col = 0; col < boardSize - 1; col++)
+            {
+                squares += wall[col, row].GetSquare();
+            }
+        }
+
+        saveLoadData.squares = squares;
+    }
+
+    public void LoadGameData(SaveLoadData saveLoadData)
+    {
+        boardSize = saveLoadData.boardSize;
     }
 
     private void MakeMove()
@@ -173,9 +191,9 @@ public class GamePlay : MonoBehaviour
                     lineRenderer.SetPosition(0, pegStart.GetPosition);
                     lineRenderer.SetPosition(1, pegStart.GetPosition);
 
-                    CreatePegLink(pegStart, peg, playerColor);
+                    CreateAndRenderLink(pegStart, peg, playerColor);
                     LinkPegs(pegStart, peg);
-                    UpDateBoxSideCount(pegStart, peg);
+                    UpDateSquareSideCount(pegStart, peg);
 
                     pegStart.Reset();
                     peg.Reset();
@@ -223,7 +241,7 @@ public class GamePlay : MonoBehaviour
         return (state);
     }
 
-    private void UpDateBoxSideCount(Peg pegStart, Peg pegEnd)
+    private void UpDateSquareSideCount(Peg pegStart, Peg pegEnd)
     {
         if (pegStart.Y == pegEnd.Y)
         {
@@ -259,6 +277,8 @@ public class GamePlay : MonoBehaviour
                 UpdateScore(gameState);
 
                 listOfGameObjects.Add(go);
+
+                wall[col, row].SetState(gameState);
 
                 //AudioManager.Instance.SoundCompleteBox();
             }
@@ -363,7 +383,7 @@ public class GamePlay : MonoBehaviour
         }
     }
 
-    private void CreatePegLink(Peg pegStart, Peg pegEnd, Color playerColor)
+    private void CreateAndRenderLink(Peg pegStart, Peg pegEnd, Color playerColor)
     {
         GameObject go = new GameObject();
         LineRenderer link = go.AddComponent<LineRenderer>();
@@ -387,7 +407,7 @@ public class GamePlay : MonoBehaviour
         {
             for (int col = 0; col < boardSize; col++)
             {
-                CreatePeg(col, row);
+                CreateAndRenderPeg(col, row);
             }
         }
 
@@ -410,7 +430,13 @@ public class GamePlay : MonoBehaviour
         backGround2.transform.position = new Vector3(delta.x, delta.y + 9.96f, 0.0f);
     }
 
-    private void CreatePeg(int col, int row)
+    /// <summary>
+    /// CreateAndRenderPeg() - Create and renders a peg at the specified col
+    /// and column position.     
+    /// </summary>
+    /// <param name="col"></param>
+    /// <param name="row"></param>
+    private void CreateAndRenderPeg(int col, int row)
     {
         GameObject go = Instantiate(pegPreFab, new Vector3(col, row, 0.0f), Quaternion.identity);
         go.transform.parent = transform;
@@ -426,11 +452,41 @@ public class GamePlay : MonoBehaviour
 
 public class Wall
 {
+    private SquareState state;
+
     private int count;
 
     public Wall()
     {
         count = 0;
+        state = SquareState.EMPTY;
+    }
+
+    public void SetState(GameState gameState)
+    {
+        state = gameState switch
+        {
+            GameState.PLAYER1 => SquareState.BLACK,
+            GameState.PLAYER2 => SquareState.WHITE,
+            _ => SquareState.EMPTY,
+        };
+    }
+
+    public string GetSquare()
+    {
+        string square = "E";
+
+        switch(state)
+        {
+            case SquareState.BLACK:
+                square = "B";
+                break;
+            case SquareState.WHITE:
+                square = "W";
+                break;
+        }
+
+        return (square);
     }
 
     public bool Add()
@@ -438,6 +494,14 @@ public class Wall
         return (++count == 4);
     }
 }
+
+public enum SquareState
+{
+    BLACK,
+    WHITE,
+    EMPTY
+}
+
 
 public enum GameState
 {

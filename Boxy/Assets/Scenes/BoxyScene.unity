@@ -4590,6 +4590,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SaveButton
       objectReference: {fileID: 0}
+    - target: {fileID: 1427531142227220482, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220483, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -4704,7 +4708,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: StopGamePlay
+      value: SaveGamePlay
       objectReference: {fileID: 0}
     - target: {fileID: 1427531142227220484, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
