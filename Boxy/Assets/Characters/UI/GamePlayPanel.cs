@@ -36,14 +36,15 @@ public class GamePlayPanel : MonoBehaviour
     {
         gameObject.SetActive(true);
 
-        boardSize = gameData.BoardSize;
-        totalSquareCount = (boardSize - 1) * (boardSize - 1);
+        squareCount = 0;
 
         playerUI = new PlayerUI[2];
         playerUI[(int)GameState.PLAYER1] = new PlayerUI(player1NameDisplay, player1Score, gameData.Player1Name);
         playerUI[(int)GameState.PLAYER2] = new PlayerUI(player2NameDisplay, player2Score, gameData.Player2Name);
 
-        gamePlay.StartGamePlay();
+        boardSize = gameData.BoardSize;
+        totalSquareCount = (boardSize - 1) * (boardSize - 1);
+        gamePlay.StartGamePlay(boardSize);
     }
 
     /// <summary>
@@ -58,15 +59,15 @@ public class GamePlayPanel : MonoBehaviour
 
     public void SaveGamePlay()
     {
-        SaveLoadData saveLoadData = new SaveLoadData();
-        saveLoadData.player1Name = player1NameDisplay.text;
-        saveLoadData.player2Name = player2NameDisplay.text;
+        SaveLoadData saveLoadData = new SaveLoadData
+        {
+            player1Name = player1NameDisplay.text,
+            player2Name = player2NameDisplay.text
+        };
 
         gamePlay.SaveGameData(saveLoadData);
 
         SaveLoadGameData.SaveGameData(saveLoadData);
-
-        LoadGamePlay();
 
         StopGamePlay();
     }
@@ -77,6 +78,8 @@ public class GamePlayPanel : MonoBehaviour
 
         if(saveLoadData != null)
         {
+            gameObject.SetActive(true);
+
             player1NameDisplay.text = saveLoadData.player1Name;
             player2NameDisplay.text = saveLoadData.player2Name;
 

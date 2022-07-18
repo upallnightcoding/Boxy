@@ -22,6 +22,13 @@ public class PlayerPanel : MonoBehaviour
         gamePlayPanel.StartGamePlay();
     }
 
+    public void LoadGame()
+    {
+        gameObject.SetActive(false);
+
+        gamePlayPanel.LoadGamePlay();
+    }
+
     public void OnPlayer1Name(string value)
     {
         gameData.Player1Name = value;

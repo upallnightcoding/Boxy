@@ -9,6 +9,10 @@ public class Peg : MonoBehaviour
     public Sprite pegClosed;
     public Sprite pegIllegal;
 
+    private SpriteRenderer spriteRenderer;
+
+    private bool selected;
+
     public bool North { get; set; }
     public bool South { get; set; }
     public bool West { get; set; }
@@ -16,13 +20,9 @@ public class Peg : MonoBehaviour
 
     public int MaxLinks { set; get; } = 0;
 
-    private SpriteRenderer spriteRenderer;
-
-    private bool selected;
-
     public Vector3 GetPosition => gameObject.transform.position;
-    public float X => gameObject.transform.position.x;
-    public float Y => gameObject.transform.position.y;
+    public int X => (int) gameObject.transform.position.x;
+    public int Y => (int) gameObject.transform.position.y;
 
     // Start is called before the first frame update
     void Start()

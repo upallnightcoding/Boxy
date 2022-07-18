@@ -9,7 +9,6 @@ public class GamePlay : MonoBehaviour
     private const float PEG_LINK_WIDTH = 0.089f;
 
     [SerializeField] private Transform cameraPos;
-    [SerializeField] private GameData gameData;
     [SerializeField] private Material drawLineMaterial;
     [SerializeField] private LineRenderer lineRenderer;
 
@@ -29,6 +28,7 @@ public class GamePlay : MonoBehaviour
     private Vector3 mousePos;
 
     private Wall[,] wall;
+    private Peg[,] pegBoard;
 
     private Peg illegalPeg = null;
 
@@ -68,11 +68,12 @@ public class GamePlay : MonoBehaviour
         }
     }
 
-    public void StartGamePlay()
+    public void StartGamePlay(int BoardSize)
     {
-        boardSize = gameData.BoardSize;
+        boardSize = BoardSize;
 
         wall = new Wall[boardSize - 1, boardSize - 1];
+        pegBoard = new Peg[boardSize, boardSize];
 
         DrawGameBoard();
 
@@ -105,16 +106,55 @@ public class GamePlay : MonoBehaviour
         {
             for (int col = 0; col < boardSize - 1; col++)
             {
-                squares += wall[col, row].GetSquare();
+                squares += wall[col, row].State;
             }
         }
 
         saveLoadData.squares = squares;
+
+        for (int row = 0; row < boardSize; row++)
+        {
+            for (int col = 0; col < boardSize - 1; col++)
+            {
+                //pegBoard[col, row].East;
+            }
+        }
     }
 
     public void LoadGameData(SaveLoadData saveLoadData)
     {
         boardSize = saveLoadData.boardSize;
+
+        StartGamePlay(boardSize);
+
+        string squares = saveLoadData.squares;
+        int squareIndex = 0;
+
+        for (int row = 0; row < boardSize - 1; row++)
+        {
+            for (int col = 0; col < boardSize - 1; col++)
+            {
+                string squareColor = squares.Substring(squareIndex, 1);
+
+                if (squareColor != "E")
+                {
+                    Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
+
+                    GameObject square = (squareColor == "B") ? squareBlackPreFab : squareWhitePreFab;
+
+                    GameObject go = Instantiate(square, position, Quaternion.identity);
+
+                    listOfGameObjects.Add(go);
+                }
+
+                squareIndex++;
+
+                //UpdateScore(gameState);
+
+
+                //wall[col, row].SetState(gameState);
+            }
+        }
     }
 
     private void MakeMove()
@@ -333,6 +373,11 @@ public class GamePlay : MonoBehaviour
         return (legalMove && !duplicate);
     }
 
+    /// <summary>
+    /// LinkPegs() - 
+    /// </summary>
+    /// <param name="p1"></param>
+    /// <param name="p2"></param>
     private void LinkPegs(Peg p1, Peg p2)
     {
         float c1 = p1.X;
@@ -432,7 +477,10 @@ public class GamePlay : MonoBehaviour
 
     /// <summary>
     /// CreateAndRenderPeg() - Create and renders a peg at the specified col
-    /// and column position.     
+    /// and column position.  The parent of the Peg is set as the transform
+    /// object.  The maximum number of links is determined by the col and row
+    /// position.  The peg is then placed in the list of objects to be deleted
+    /// at the end of the game.
     /// </summary>
     /// <param name="col"></param>
     /// <param name="row"></param>
@@ -443,8 +491,9 @@ public class GamePlay : MonoBehaviour
 
         Peg peg = go.GetComponent<Peg>();
         peg.SetMaxLinks(col, row, boardSize);
+        pegBoard[col, row] = peg;
 
-        go.name = $"Peg: {col}, {row} {peg.MaxLinks}";
+        go.name = $"Peg: {col}, {row}, {peg.MaxLinks}";
 
         listOfGameObjects.Add(go);
     }
@@ -452,41 +501,24 @@ public class GamePlay : MonoBehaviour
 
 public class Wall
 {
-    private SquareState state;
+    public string State { get; private set; }
 
     private int count;
 
     public Wall()
     {
         count = 0;
-        state = SquareState.EMPTY;
+        State = PlayerColor.EMPTY;
     }
 
-    public void SetState(GameState gameState)
+    public void SetState(GameState player)
     {
-        state = gameState switch
+        State = player switch
         {
-            GameState.PLAYER1 => SquareState.BLACK,
-            GameState.PLAYER2 => SquareState.WHITE,
-            _ => SquareState.EMPTY,
+            GameState.PLAYER1 => PlayerColor.BLACK,
+            GameState.PLAYER2 => PlayerColor.WHITE,
+            _ => PlayerColor.EMPTY,
         };
-    }
-
-    public string GetSquare()
-    {
-        string square = "E";
-
-        switch(state)
-        {
-            case SquareState.BLACK:
-                square = "B";
-                break;
-            case SquareState.WHITE:
-                square = "W";
-                break;
-        }
-
-        return (square);
     }
 
     public bool Add()
@@ -495,13 +527,16 @@ public class Wall
     }
 }
 
-public enum SquareState
+/// <summary>
+/// PlayerColor() - Defines the colors that are assoicated with
+/// each player.  
+/// </summary>
+public static class PlayerColor
 {
-    BLACK,
-    WHITE,
-    EMPTY
+    public static readonly string BLACK = "B";
+    public static readonly string WHITE = "W";
+    public static readonly string EMPTY = "E";
 }
-
 
 public enum GameState
 {
