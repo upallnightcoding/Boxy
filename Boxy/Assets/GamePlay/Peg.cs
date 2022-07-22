@@ -13,10 +13,10 @@ public class Peg : MonoBehaviour
 
     private bool selected;
 
-    public bool North { get; set; }
-    public bool South { get; set; }
-    public bool West { get; set; }
-    public bool East { get; set; }
+    public PegLink North;
+    public PegLink South;
+    public PegLink West;
+    public PegLink East;
 
     public int MaxLinks { set; get; } = 0;
 
@@ -24,15 +24,36 @@ public class Peg : MonoBehaviour
     public int X => (int) gameObject.transform.position.x;
     public int Y => (int) gameObject.transform.position.y;
 
+    public bool IsNorthLinked => North.IsLinked;
+    public bool IsSouthLinked => South.IsLinked;
+    public bool IsWestLinked => West.IsLinked;
+    public bool IsEastLinked => East.IsLinked;
+
+    public string GetColorNorth => North.GetColor;
+    public string GetColorSouth => South.GetColor;
+    public string GetColorWest => West.GetColor;
+    public string GetColorEast => East.GetColor;
+
     // Start is called before the first frame update
     void Start()
     {
+
+    }
+
+    public void SetNorth(GameState player) { North.Set(player); }
+    public void SetSouth(GameState player) { South.Set(player); }
+    public void SetEast(GameState player) { East.Set(player); }
+    public void SetWest(GameState player) { West.Set(player); }
+
+    public void Initialize()
+    {
+        Debug.Log("Peg Initialize ...");
         selected = false;
 
-        North = false;
-        South = false;
-        East = false;
-        West = false;
+        North = new PegLink();
+        South = new PegLink();
+        East = new PegLink();
+        West = new PegLink();
 
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
@@ -75,11 +96,35 @@ public class Peg : MonoBehaviour
     {
         int count = 0;
 
-        if (North) count++;
-        if (South) count++;
-        if (East) count++;
-        if (West) count++;
+        if (North.IsLinked) count++;
+        if (South.IsLinked) count++;
+        if (East.IsLinked) count++;
+        if (West.IsLinked) count++;
 
         return (count < MaxLinks);
+    }
+}
+
+public class PegLink {
+    private bool linked = false;
+    private string color = PlayerColor.EMPTY;
+
+    public bool IsLinked => linked;
+    public string GetColor => color;
+
+    /// <summary>
+    /// Set() - 
+    /// </summary>
+    /// <param name="player"></param>
+    public void Set(GameState player)
+    {
+        linked = true;
+
+        color = player switch
+        {
+            GameState.PLAYER1 => PlayerColor.BLACK,
+            GameState.PLAYER2 => PlayerColor.WHITE,
+            _ => PlayerColor.EMPTY,
+        };
     }
 }

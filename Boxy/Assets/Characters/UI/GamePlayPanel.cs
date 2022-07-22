@@ -44,6 +44,7 @@ public class GamePlayPanel : MonoBehaviour
 
         boardSize = gameData.BoardSize;
         totalSquareCount = (boardSize - 1) * (boardSize - 1);
+
         gamePlay.StartGamePlay(boardSize);
     }
 
@@ -80,11 +81,20 @@ public class GamePlayPanel : MonoBehaviour
         {
             gameObject.SetActive(true);
 
-            player1NameDisplay.text = saveLoadData.player1Name;
-            player2NameDisplay.text = saveLoadData.player2Name;
+            squareCount = 0;
+
+            playerUI = new PlayerUI[2];
+            playerUI[(int)GameState.PLAYER1] = new PlayerUI(player1NameDisplay, player1Score, saveLoadData.player1Name);
+            playerUI[(int)GameState.PLAYER2] = new PlayerUI(player2NameDisplay, player2Score, saveLoadData.player2Name);
 
             gamePlay.LoadGameData(saveLoadData);
         }
+    }
+
+    public void ResetScore()
+    {
+        playerUI[(int)GameState.PLAYER1].ResetScore();
+        playerUI[(int)GameState.PLAYER2].ResetScore();
     }
 
     public void UpdateScore(GameState gameState)
@@ -105,7 +115,7 @@ public class GamePlayPanel : MonoBehaviour
     {
         if (++squareCount == totalSquareCount)
         {
-            message.text = "You Won";
+            message.text = "You Tied";
 
             if (playerUI[0].Score > playerUI[1].Score)
             {
@@ -142,6 +152,16 @@ public class PlayerUI
     public void IncScore()
     {
         Score++;
+        displayScore.text = Score.ToString();
+    }
+
+    /// <summary>
+    /// ResetScore() - Resets the score to zero to initialize the score
+    /// for the beginning of the game or after a load previous game.
+    /// </summary>
+    public void ResetScore()
+    {
+        Score = 0;
         displayScore.text = Score.ToString();
     }
 
