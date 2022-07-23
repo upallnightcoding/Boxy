@@ -45,7 +45,7 @@ public class GamePlayPanel : MonoBehaviour
         boardSize = gameData.BoardSize;
         totalSquareCount = (boardSize - 1) * (boardSize - 1);
 
-        gamePlay.StartGamePlay(boardSize);
+        gamePlay.StartGamePlay(gameData);
     }
 
     /// <summary>

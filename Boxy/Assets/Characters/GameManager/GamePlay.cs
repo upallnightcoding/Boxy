@@ -6,18 +6,19 @@ public class GamePlay : MonoBehaviour
 {
     // Class Constants
     private const int LEFT_MOUSE_BUTTON = 0;
-    private const float PEG_LINK_WIDTH = 0.089f;
+    
 
     [SerializeField] private Transform cameraPos;
     [SerializeField] private Material drawLineMaterial;
     [SerializeField] private LineRenderer lineRenderer;
 
-    [SerializeField] private GameObject pegPreFab;
     [SerializeField] private GameObject squareBlackPreFab;
     [SerializeField] private GameObject squareWhitePreFab;
 
-    [SerializeField] GameObject backGround1;
-    [SerializeField] GameObject backGround2;
+    [SerializeField] private GameRenderer gameRenderer;
+
+    //[SerializeField] GameObject backGround1;
+    //[SerializeField] GameObject backGround2;
 
     [SerializeField] GameObject gamePlayPanel;
 
@@ -29,7 +30,7 @@ public class GamePlay : MonoBehaviour
     private bool leftMouseButton;
     private Vector3 mousePos;
 
-    private Wall[,] wall;
+    private SquareWall[,] wall;
     private Peg[,] pegBoard;
 
     private Peg illegalPeg = null;
@@ -40,14 +41,14 @@ public class GamePlay : MonoBehaviour
     private GameState gameState = GameState.IDLE;
     private SelectionState selectionState = SelectionState.ANCHOR;
 
-    private List<GameObject> listOfGameObjects = new List<GameObject>();
+    private List<GameObject> listOfGameObjects;
+
+
 
     private GameObject GetPlayer => (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
-    private Color GetPlayerColor
-    {
-        get { return (GetPlayer.GetComponent<SpriteRenderer>().color); }
-    }
+    // Return the current color
+    private Color GetPlayerColor => GetPlayer.GetComponent<SpriteRenderer>().color;
 
     // Update is called once per frame
     void Update()
@@ -70,17 +71,22 @@ public class GamePlay : MonoBehaviour
         }
     }
 
-    public void StartGamePlay(int BoardSize)
+    /// <summary>
+    /// StartGamePlay() - 
+    /// </summary>
+    /// <param name="gameData"></param>
+    public void StartGamePlay(GameData gameData)
     {
-        boardSize = BoardSize;
-
-        wall = new Wall[boardSize - 1, boardSize - 1];
-        pegBoard = new Peg[boardSize, boardSize];
-
-        DrawGameBoard();
-
         gameState = GameState.PLAYER1;
         selectionState = SelectionState.ANCHOR;
+        boardSize = gameData.BoardSize;
+
+        gameRenderer.DrawGameBoard(gameData);
+
+        wall = gameRenderer.GetWalls();
+        pegBoard = gameRenderer.GetPegBoard();
+        listOfGameObjects = gameRenderer.GetListOfGameObjects();
+        cameraPos.transform.position = gameRenderer.GetNewCameraPosition();
     }
 
     public void StopGamePlay()
@@ -153,7 +159,7 @@ public class GamePlay : MonoBehaviour
 
         boardSize = saveLoadData.boardSize;
 
-        StartGamePlay(boardSize);
+        //StartGamePlay(gameData);
 
         string squares = saveLoadData.squares;
         int squareIndex = 0;
@@ -286,13 +292,6 @@ public class GamePlay : MonoBehaviour
                     lineRenderer.SetPosition(0, pegStart.GetPosition);
                     lineRenderer.SetPosition(1, pegStart.GetPosition);
 
-                    /*CreateAndRenderLink(pegStart, peg);
-                    LinkPegs(pegStart, peg);
-                    UpDateSquareSideCount(pegStart, peg);
-
-                    pegStart.Reset();
-                    peg.Reset();*/
-
                     RenderLink(pegStart, peg, GetPlayerColor);
 
                     state = SelectionState.ANCHOR;
@@ -340,7 +339,7 @@ public class GamePlay : MonoBehaviour
 
     private void RenderLink(Peg pegStart, Peg pegEnd, Color color)
     {
-        CreateAndRenderLink(pegStart, pegEnd, color);
+        gameRenderer.DrawWall(pegStart, pegEnd, color);
         LinkPegs(pegStart, pegEnd);
         UpDateSquareSideCount(pegStart, pegEnd);
 
@@ -385,17 +384,19 @@ public class GamePlay : MonoBehaviour
                 GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
                 GameObject go = Instantiate(square, position, Quaternion.identity);
+                go.name = $"Box: {col}, {row}";
+
+                //gameRenderer.DrawBox(col, row, gameState);
 
                 UpdateScore(gameState);
 
-                listOfGameObjects.Add(go);
+                //listOfGameObjects.Add(go);
 
                 wall[col, row].SetState(gameState);
 
                 //AudioManager.Instance.SoundCompleteBox();
             }
         }
-
     }
 
     private void UpdateScore(GameState gameState)
@@ -505,7 +506,7 @@ public class GamePlay : MonoBehaviour
         }
     }
 
-    private void CreateAndRenderLink(Peg pegStart, Peg pegEnd, Color color)
+    /*private void CreateAndRenderLink(Peg pegStart, Peg pegEnd, Color color)
     {
         GameObject go = new GameObject();
         LineRenderer link = go.AddComponent<LineRenderer>();
@@ -521,9 +522,9 @@ public class GamePlay : MonoBehaviour
         link.transform.parent = transform;
 
         listOfGameObjects.Add(go);
-    }
+    }*/
 
-    private void DrawGameBoard()
+    /*private void DrawGameBoard()
     {
         for (int row = 0; row < boardSize; row++)
         {
@@ -537,7 +538,7 @@ public class GamePlay : MonoBehaviour
         {
             for (int col = 0; col < boardSize - 1; col++)
             {
-                wall[col, row] = new Wall();
+                wall[col, row] = new SquareWall();
             }
         }
 
@@ -550,7 +551,7 @@ public class GamePlay : MonoBehaviour
 
         backGround1.transform.position = new Vector3(delta.x, delta.y, 0.0f);
         backGround2.transform.position = new Vector3(delta.x, delta.y + 9.96f, 0.0f);
-    }
+    }*/
 
     /// <summary>
     /// CreateAndRenderPeg() - Create and renders a peg at the specified col
@@ -561,7 +562,7 @@ public class GamePlay : MonoBehaviour
     /// </summary>
     /// <param name="col"></param>
     /// <param name="row"></param>
-    private void CreateAndRenderPeg(int col, int row)
+    /*private void CreateAndRenderPeg(int col, int row)
     {
         GameObject go = Instantiate(pegPreFab, new Vector3(col, row, 0.0f), Quaternion.identity);
         go.transform.parent = transform;
@@ -575,16 +576,16 @@ public class GamePlay : MonoBehaviour
         go.name = $"Peg: {col}, {row}, {peg.MaxLinks}";
 
         listOfGameObjects.Add(go);
-    }
+    }*/
 }
 
-public class Wall
+public class SquareWall
 {
     public string State { get; private set; }
 
     private int count;
 
-    public Wall()
+    public SquareWall()
     {
         count = 0;
         State = PlayerColor.EMPTY;
