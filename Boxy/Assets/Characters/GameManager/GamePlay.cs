@@ -16,6 +16,7 @@ public class GamePlay : MonoBehaviour
     [SerializeField] private GameObject squareWhitePreFab;
 
     [SerializeField] private GameRenderer gameRenderer;
+    [SerializeField] private GameLogic gameLogic;
 
     //[SerializeField] GameObject backGround1;
     //[SerializeField] GameObject backGround2;
@@ -35,7 +36,7 @@ public class GamePlay : MonoBehaviour
 
     private Peg illegalPeg = null;
 
-    private Peg pegStart;
+    //private Peg pegStart;
 
     // Initial Game State
     private GameState gameState = GameState.IDLE;
@@ -258,14 +259,16 @@ public class GamePlay : MonoBehaviour
 
                 if (peg.IsOpen())
                 {
-                    peg.Selected();
+                    //peg.Selected();
 
-                    pegStart = peg;
+                    //pegStart = peg;
 
                     selection = SelectionState.PIN;
 
-                    lineRenderer.startColor = GetPlayerColor;
-                    lineRenderer.endColor = GetPlayerColor;
+                    //lineRenderer.startColor = GetPlayerColor;
+                    //lineRenderer.endColor = GetPlayerColor;
+
+                    gameRenderer.SetWallAnchorPeg(peg, GetPlayerColor);
                 }
             }
         }
@@ -287,12 +290,11 @@ public class GamePlay : MonoBehaviour
             {
                 Peg peg = hits.collider.GetComponent<Peg>();
 
-                if (peg.IsOpen() && LegalMove(pegStart, peg))
+                if (peg.IsOpen() && gameLogic.LegalMove(gameRenderer.GetStartPeg(), peg))
                 {
-                    lineRenderer.SetPosition(0, pegStart.GetPosition);
-                    lineRenderer.SetPosition(1, pegStart.GetPosition);
+                    gameRenderer.RemoveLineRenderer();
 
-                    RenderLink(pegStart, peg, GetPlayerColor);
+                    RenderLink(gameRenderer.GetStartPeg(), peg, GetPlayerColor);
 
                     state = SelectionState.ANCHOR;
 
@@ -301,18 +303,16 @@ public class GamePlay : MonoBehaviour
             }
             else
             {
-                lineRenderer.SetPosition(0, pegStart.GetPosition);
-                lineRenderer.SetPosition(1, pegStart.GetPosition);
+                gameRenderer.RemoveLineRenderer();
 
-                pegStart.Reset();
+                gameRenderer.GetStartPeg().Reset();
 
                 state = SelectionState.CANCEL;
             }
         }
         else
         {
-            lineRenderer.SetPosition(0, pegStart.GetPosition);
-            lineRenderer.SetPosition(1, ray.GetPoint(0.0f));
+            gameRenderer.AnimateRenderLine(ray.GetPoint(0.0f));
 
             RaycastHit2D hits = Physics2D.GetRayIntersection(ray);
 
@@ -320,7 +320,7 @@ public class GamePlay : MonoBehaviour
             {
                 Peg peg = hits.collider.GetComponent<Peg>();
 
-                if (!LegalMove(pegStart, peg))
+                if (!gameLogic.LegalMove(gameRenderer.GetStartPeg(), peg))
                 {
                     peg.Illegal();
 
@@ -339,23 +339,28 @@ public class GamePlay : MonoBehaviour
 
     private void RenderLink(Peg pegStart, Peg pegEnd, Color color)
     {
+        GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
+
         gameRenderer.DrawWall(pegStart, pegEnd, color);
-        LinkPegs(pegStart, pegEnd);
-        UpDateSquareSideCount(pegStart, pegEnd);
+
+        gameLogic.LinkPegs(pegStart, pegEnd, gameState);
+        gameLogic.UpDateSquareSideCount(pegStart, pegEnd, square, boardSize, wall, gameState, loadMode);
 
         pegStart.Reset();
         pegEnd.Reset();
     }
 
-    private void UpDateSquareSideCount(Peg pegStart, Peg pegEnd)
+    /*private void UpDateSquareSideCount(Peg pegStart, Peg pegEnd)
     {
+        GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
+
         if (pegStart.Y == pegEnd.Y)
         {
             int col = Mathf.Min((int)pegStart.X, (int)pegEnd.X);
             int row = (int)pegStart.Y;
 
-            AddOneToBoxSideCount(col, row);
-            AddOneToBoxSideCount(col, row - 1);
+            gameLogic.AddOneToBoxSideCount(col, row, boardSize, wall, gameState, square, loadMode);
+            gameLogic.AddOneToBoxSideCount(col, row - 1, boardSize, wall, gameState, square, loadMode);
         }
 
         if (pegStart.X == pegEnd.X)
@@ -363,17 +368,17 @@ public class GamePlay : MonoBehaviour
             int col = (int)pegStart.X;
             int row = Mathf.Min((int)pegStart.Y, (int)pegEnd.Y);
 
-            AddOneToBoxSideCount(col, row);
-            AddOneToBoxSideCount(col - 1, row);
+            gameLogic.AddOneToBoxSideCount(col, row, boardSize, wall, gameState, square, loadMode);
+            gameLogic.AddOneToBoxSideCount(col - 1, row, boardSize, wall, gameState, square, loadMode);
         }
-    }
+    }*/
 
     /// <summary>
     /// AddOneToBoxSideCount() - 
     /// </summary>
     /// <param name="col"></param>
     /// <param name="row"></param>
-    private void AddOneToBoxSideCount(int col, int row)
+    /*private void AddOneToBoxSideCount(int col, int row)
     {
         if ((col >= 0) && (row >= 0) && (col < boardSize - 1) && (row < boardSize - 1))
         {
@@ -397,19 +402,19 @@ public class GamePlay : MonoBehaviour
                 //AudioManager.Instance.SoundCompleteBox();
             }
         }
-    }
+    }*/
 
-    private void UpdateScore(GameState gameState)
+    /*private void UpdateScore(GameState gameState)
     {
         gamePlayPanel.GetComponent<GamePlayPanel>().UpdateScore(gameState);
-    }
+    }*/
 
     private void ResetScore()
     {
         gamePlayPanel.GetComponent<GamePlayPanel>().ResetScore();
     }
 
-    private bool LegalMove(Peg pegStart, Peg pegEnd)
+    /*private bool LegalMove(Peg pegStart, Peg pegEnd)
     {
         float c1 = pegStart.X;
         float r1 = pegStart.Y;
@@ -449,14 +454,14 @@ public class GamePlay : MonoBehaviour
         bool legalMove = rowMove || colMove;
 
         return (legalMove && !duplicate);
-    }
+    }*/
 
     /// <summary>
     /// LinkPegs() - 
     /// </summary>
     /// <param name="p1"></param>
     /// <param name="p2"></param>
-    private void LinkPegs(Peg p1, Peg p2)
+    /*private void LinkPegs(Peg p1, Peg p2)
     {
         float c1 = p1.X;
         float r1 = p1.Y;
@@ -491,7 +496,7 @@ public class GamePlay : MonoBehaviour
                 p1.SetSouth(gameState);
             }
         }
-    }
+    }*/
 
     private void TogglePlayer()
     {

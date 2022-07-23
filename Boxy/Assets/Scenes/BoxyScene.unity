@@ -5826,6 +5826,7 @@ GameObject:
   - component: {fileID: 1533695525}
   - component: {fileID: 1533695524}
   - component: {fileID: 1533695526}
+  - component: {fileID: 1533695527}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5975,6 +5976,7 @@ MonoBehaviour:
   squareBlackPreFab: {fileID: 3687205964819395846, guid: cb336362857dd4c4db76ec10a0b301bb, type: 3}
   squareWhitePreFab: {fileID: 7039796178990604985, guid: aac7ec203c390484286c6fb3de607943, type: 3}
   gameRenderer: {fileID: 1533695526}
+  gameLogic: {fileID: 1533695527}
   gamePlayPanel: {fileID: 373515592}
 --- !u!114 &1533695526
 MonoBehaviour:
@@ -5994,6 +5996,20 @@ MonoBehaviour:
   drawLineMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   squareBlackPreFab: {fileID: 3687205964819395846, guid: cb336362857dd4c4db76ec10a0b301bb, type: 3}
   squareWhitePreFab: {fileID: 7039796178990604985, guid: aac7ec203c390484286c6fb3de607943, type: 3}
+  lineRenderer: {fileID: 1533695524}
+--- !u!114 &1533695527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533695521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed7853c155acb9342a0cefd301acafb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gamePlayPanel: {fileID: 373515594}
 --- !u!224 &1614032562 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1427531142227220483, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}

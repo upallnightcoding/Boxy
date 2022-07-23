@@ -12,6 +12,7 @@ public class GameRenderer : MonoBehaviour
     [SerializeField] private Material drawLineMaterial;
     [SerializeField] private GameObject squareBlackPreFab;
     [SerializeField] private GameObject squareWhitePreFab;
+    [SerializeField] private LineRenderer lineRenderer;
 
     // Board Walls
     //------------
@@ -20,6 +21,8 @@ public class GameRenderer : MonoBehaviour
     // Peg Board
     //----------
     private Peg[,] pegBoard;
+
+    private Peg pegStart;
 
     // Calculated new camera position over peg board
     //----------------------------------------------
@@ -35,6 +38,7 @@ public class GameRenderer : MonoBehaviour
     public SquareWall[,] GetWalls() => wall;
     public Peg[,] GetPegBoard() => pegBoard;
     public List<GameObject> GetListOfGameObjects() => listOfGameObjects;
+    public Peg GetStartPeg() => pegStart;
 
     public void DrawGameBoard(GameData gameData)
     {
@@ -50,6 +54,27 @@ public class GameRenderer : MonoBehaviour
         CreateBoardWalls(boardSize);
 
         PositionCameraAndBackGround(boardSize);
+    }
+
+    public void SetWallAnchorPeg(Peg peg, Color color)
+    {
+        lineRenderer.startColor = color;
+        lineRenderer.endColor = color;
+
+        pegStart = peg;
+        pegStart.Selected();
+    }
+
+    public void AnimateRenderLine(Vector3 position)
+    {
+        lineRenderer.SetPosition(0, pegStart.GetPosition);
+        lineRenderer.SetPosition(1, position);
+    }
+
+    public void RemoveLineRenderer()
+    {
+        lineRenderer.SetPosition(0, pegStart.GetPosition);
+        lineRenderer.SetPosition(1, pegStart.GetPosition);
     }
 
     public void DrawWall(Peg pegStart, Peg pegEnd, Color color)
