@@ -14,13 +14,15 @@ public class GameRenderer : MonoBehaviour
     [SerializeField] private GameObject squareWhitePreFab;
     [SerializeField] private LineRenderer lineRenderer;
 
+    [SerializeField] private GameLogic gameLogic;
+
     // Board Walls
     //------------
-    private SquareWall[,] wall;
+    //private SquareWall[,] wall;
 
     // Peg Board
     //----------
-    private Peg[,] pegBoard;
+    //private Peg[,] pegBoard;
 
     private Peg pegStart;
 
@@ -35,18 +37,12 @@ public class GameRenderer : MonoBehaviour
     // Property Get Functions
     //-----------------------
     public Vector3 GetNewCameraPosition() => newCameraPosition;
-    public SquareWall[,] GetWalls() => wall;
-    public Peg[,] GetPegBoard() => pegBoard;
     public List<GameObject> GetListOfGameObjects() => listOfGameObjects;
     public Peg GetStartPeg() => pegStart;
+    public void AddListOfGameObjects(GameObject go) => listOfGameObjects.Add(go);
 
-    public void DrawGameBoard(GameData gameData)
+    public void DrawGameBoard(int boardSize)
     {
-        int boardSize = gameData.BoardSize;
-                    
-        wall = new SquareWall[boardSize - 1, boardSize - 1];
-        pegBoard = new Peg[boardSize, boardSize];
-
         listOfGameObjects = new List<GameObject>();
 
         CreateAndRenderPegs(boardSize);
@@ -95,11 +91,14 @@ public class GameRenderer : MonoBehaviour
         listOfGameObjects.Add(go);
     }
 
-    public void DrawBox(int col, int row, GameState gameState)
+    public void DrawBox(BoxPos boxPos, GameObject square)
+    {
+        DrawBox(boxPos.Col, boxPos.Row, square);
+    }
+
+    public void DrawBox(int col, int row, GameObject square)
     {
         Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
-
-        GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
         GameObject go = Instantiate(square, position, Quaternion.identity);
 
@@ -123,7 +122,7 @@ public class GameRenderer : MonoBehaviour
         {
             for (int col = 0; col < boardSize - 1; col++)
             {
-                wall[col, row] = new SquareWall();
+                gameLogic.InitWall(col, row);
             }
         }
     }
@@ -141,7 +140,7 @@ public class GameRenderer : MonoBehaviour
                 peg.Initialize();
                 peg.SetMaxLinks(col, row, boardSize);
 
-                pegBoard[col, row] = peg;
+                gameLogic.SetPegBoard(col, row, peg);
 
                 go.name = $"Peg: {col}, {row}, {peg.MaxLinks}";
 

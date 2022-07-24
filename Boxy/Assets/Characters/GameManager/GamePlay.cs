@@ -42,14 +42,12 @@ public class GamePlay : MonoBehaviour
     private GameState gameState = GameState.IDLE;
     private SelectionState selectionState = SelectionState.ANCHOR;
 
-    private List<GameObject> listOfGameObjects;
+    //private List<GameObject> listOfGameObjects;
 
-
-
-    private GameObject GetPlayer => (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
+    private GameObject GetPlayer() => (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
     // Return the current color
-    private Color GetPlayerColor => GetPlayer.GetComponent<SpriteRenderer>().color;
+    private Color GetPlayerColor() => GetPlayer().GetComponent<SpriteRenderer>().color;
 
     // Update is called once per frame
     void Update()
@@ -76,23 +74,24 @@ public class GamePlay : MonoBehaviour
     /// StartGamePlay() - 
     /// </summary>
     /// <param name="gameData"></param>
-    public void StartGamePlay(GameData gameData)
+    public void StartGamePlay(int boardSize)
     {
         gameState = GameState.PLAYER1;
         selectionState = SelectionState.ANCHOR;
-        boardSize = gameData.BoardSize;
+        this.boardSize = boardSize;
 
-        gameRenderer.DrawGameBoard(gameData);
+        gameLogic.Initialize(boardSize);
 
-        wall = gameRenderer.GetWalls();
-        pegBoard = gameRenderer.GetPegBoard();
-        listOfGameObjects = gameRenderer.GetListOfGameObjects();
+        gameRenderer.DrawGameBoard(boardSize);
+
+        wall = gameLogic.GetWalls();
+        pegBoard = gameLogic.GetPegBoard();
         cameraPos.transform.position = gameRenderer.GetNewCameraPosition();
     }
 
     public void StopGamePlay()
     {
-        foreach (GameObject go in listOfGameObjects)
+        foreach (GameObject go in gameRenderer.GetListOfGameObjects())
         {
             Destroy(go);
         }
@@ -108,44 +107,9 @@ public class GamePlay : MonoBehaviour
     {
         saveLoadData.Initialize();
 
-        string squares = "";
-
         saveLoadData.boardSize = boardSize;
 
-        // Save the squares that have been set to black or white
-        for (int row = 0; row < boardSize - 1; row++)
-        {
-            for (int col = 0; col < boardSize - 1; col++)
-            {
-                squares += wall[col, row].State;
-            }
-        }
-
-        saveLoadData.squares = squares;
-
-        string rowLinks = "";
-
-        for (int row = 0; row < boardSize; row++)
-        {
-            for (int col = 0; col < boardSize - 1; col++)
-            {
-                rowLinks += pegBoard[col, row].GetColorEast;
-            }
-        }
-
-        saveLoadData.rowLinks = rowLinks;
-
-        string colLinks = "";
-
-        for (int col = 0; col < boardSize; col++)
-        {
-            for (int row = 0; row < boardSize - 1; row++)
-            {
-                colLinks += pegBoard[col, row].GetColorNorth;
-            }
-        }
-
-        saveLoadData.colLinks = colLinks;
+        gameLogic.SaveGameData(saveLoadData, boardSize);
     }
 
     /// <summary>
@@ -160,7 +124,7 @@ public class GamePlay : MonoBehaviour
 
         boardSize = saveLoadData.boardSize;
 
-        //StartGamePlay(gameData);
+        StartGamePlay(boardSize);
 
         string squares = saveLoadData.squares;
         int squareIndex = 0;
@@ -173,13 +137,17 @@ public class GamePlay : MonoBehaviour
 
                 if (squareColor != PlayerColor.EMPTY)
                 {
-                    Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
+                    /*Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
 
                     GameObject square = (squareColor == PlayerColor.BLACK) ? squareBlackPreFab : squareWhitePreFab;
 
                     GameObject go = Instantiate(square, position, Quaternion.identity);
 
-                    listOfGameObjects.Add(go);
+                    gameRenderer.AddListOfGameObjects(go);*/
+
+                    GameObject square = (squareColor == PlayerColor.BLACK) ? squareBlackPreFab : squareWhitePreFab;
+
+                    gameRenderer.DrawBox(col, row, square);
                 }
             }
         }
@@ -268,7 +236,7 @@ public class GamePlay : MonoBehaviour
                     //lineRenderer.startColor = GetPlayerColor;
                     //lineRenderer.endColor = GetPlayerColor;
 
-                    gameRenderer.SetWallAnchorPeg(peg, GetPlayerColor);
+                    gameRenderer.SetWallAnchorPeg(peg, GetPlayerColor());
                 }
             }
         }
@@ -294,7 +262,7 @@ public class GamePlay : MonoBehaviour
                 {
                     gameRenderer.RemoveLineRenderer();
 
-                    RenderLink(gameRenderer.GetStartPeg(), peg, GetPlayerColor);
+                    RenderLink(gameRenderer.GetStartPeg(), peg, GetPlayerColor());
 
                     state = SelectionState.ANCHOR;
 
@@ -341,13 +309,24 @@ public class GamePlay : MonoBehaviour
     {
         GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
+        BoxPosList boxPosList = new BoxPosList(); 
+
         gameRenderer.DrawWall(pegStart, pegEnd, color);
 
         gameLogic.LinkPegs(pegStart, pegEnd, gameState);
-        gameLogic.UpDateSquareSideCount(pegStart, pegEnd, square, boardSize, wall, gameState, loadMode);
+        gameLogic.UpdateWallCount(pegStart, pegEnd, square, boardSize, wall, gameState, loadMode, boxPosList);
+        CheckBoxCount(boxPosList);
 
         pegStart.Reset();
         pegEnd.Reset();
+    }
+
+    private void CheckBoxCount(BoxPosList boxPosList)
+    {
+        boxPosList.ForEachBox(delegate (BoxPos boxPos)
+        {
+            gameRenderer.DrawBox(boxPos, GetPlayer());
+        });
     }
 
     /*private void UpDateSquareSideCount(Peg pegStart, Peg pegEnd)
@@ -505,7 +484,7 @@ public class GamePlay : MonoBehaviour
 
     public void EndGamePlay()
     {
-        foreach (GameObject go in listOfGameObjects)
+        foreach (GameObject go in gameRenderer.GetListOfGameObjects())
         {
             Destroy(go);
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,65 @@ using UnityEngine;
 public class GameLogic : MonoBehaviour
 {
     [SerializeField] private GamePlayPanel gamePlayPanel;
+
+    // Board Walls
+    //------------
+    private SquareWall[,] wall;
+
+    // Peg Board
+    //----------
+    private Peg[,] pegBoard;
+
+    public SquareWall[,] GetWalls() => wall;
+    public Peg[,] GetPegBoard() => pegBoard;
+    public void SetPegBoard(int col, int row, Peg peg) => pegBoard[col, row] = peg;
+    public void InitWall(int col, int row) => wall[col, row] = new SquareWall();
+
+    public void Initialize(int boardSize)
+    {
+        wall = new SquareWall[boardSize - 1, boardSize - 1];
+        pegBoard = new Peg[boardSize, boardSize];
+    }
+
+    public void SaveGameData(SaveLoadData saveLoadData, int boardSize)
+    {
+        string squares = "";
+
+        // Save the squares that have been set to black or white
+        for (int row = 0; row < boardSize - 1; row++)
+        {
+            for (int col = 0; col < boardSize - 1; col++)
+            {
+                squares += wall[col, row].State;
+            }
+        }
+
+        saveLoadData.squares = squares;
+
+        string rowLinks = "";
+
+        for (int row = 0; row < boardSize; row++)
+        {
+            for (int col = 0; col < boardSize - 1; col++)
+            {
+                rowLinks += pegBoard[col, row].GetColorEast;
+            }
+        }
+
+        saveLoadData.rowLinks = rowLinks;
+
+        string colLinks = "";
+
+        for (int col = 0; col < boardSize; col++)
+        {
+            for (int row = 0; row < boardSize - 1; row++)
+            {
+                colLinks += pegBoard[col, row].GetColorNorth;
+            }
+        }
+
+        saveLoadData.colLinks = colLinks;
+    }
 
     public bool LegalMove(Peg pegStart, Peg pegEnd)
     {
@@ -85,16 +145,18 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    public void AddOneToBoxSideCount(int col, int row, int boardSize, SquareWall[,] wall, GameState gameState, GameObject square, bool loadMode)
+    private void AddOneToWallCount(int col, int row, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode, BoxPosList boxPosList)
     {
         if ((col >= 0) && (row >= 0) && (col < boardSize - 1) && (row < boardSize - 1))
         {
             if (wall[col, row].Add() && !loadMode)
             {
-                Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
+                //Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
 
-                GameObject go = Instantiate(square, position, Quaternion.identity);
-                go.name = $"Box: {col}, {row}";
+                //GameObject go = Instantiate(square, position, Quaternion.identity);
+                //go.name = $"Box: {col}, {row}";
+
+                boxPosList.Add(col, row);
 
                 //gameRenderer.DrawBox(col, row, gameState);
 
@@ -111,7 +173,7 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    public void UpDateSquareSideCount(Peg pegStart, Peg pegEnd, GameObject square, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode)
+    public void UpdateWallCount(Peg pegStart, Peg pegEnd, GameObject square, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode, BoxPosList boxPosList)
     {
         //GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
@@ -120,8 +182,8 @@ public class GameLogic : MonoBehaviour
             int col = Mathf.Min((int)pegStart.X, (int)pegEnd.X);
             int row = (int)pegStart.Y;
 
-            AddOneToBoxSideCount(col, row, boardSize, wall, gameState, square, loadMode);
-            AddOneToBoxSideCount(col, row - 1, boardSize, wall, gameState, square, loadMode);
+            AddOneToWallCount(col, row, boardSize, wall, gameState, loadMode, boxPosList);
+            AddOneToWallCount(col, row - 1, boardSize, wall, gameState, loadMode, boxPosList);
         }
 
         if (pegStart.X == pegEnd.X)
@@ -129,8 +191,40 @@ public class GameLogic : MonoBehaviour
             int col = (int)pegStart.X;
             int row = Mathf.Min((int)pegStart.Y, (int)pegEnd.Y);
 
-            AddOneToBoxSideCount(col, row, boardSize, wall, gameState, square, loadMode);
-            AddOneToBoxSideCount(col - 1, row, boardSize, wall, gameState, square, loadMode);
+            AddOneToWallCount(col, row, boardSize, wall, gameState, loadMode, boxPosList);
+            AddOneToWallCount(col - 1, row, boardSize, wall, gameState, loadMode, boxPosList);
         }
+    }
+}
+
+public class BoxPosList
+{
+    private List<BoxPos> list;
+
+    public BoxPosList()
+    {
+        list = new List<BoxPos>();
+    }
+
+    public void Add(int col, int row)
+    {
+        list.Add(new BoxPos(col, row));
+    }
+
+    public void ForEachBox(Action<BoxPos> action)
+    {
+        list.ForEach(action);
+    }
+}
+
+public class BoxPos
+{
+    public int Col { get; }
+    public int Row { get; }
+
+    public BoxPos(int col, int row)
+    {
+        this.Col = col;
+        this.Row = row;
     }
 }

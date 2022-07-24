@@ -3674,7 +3674,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 00
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ef8219c25e46a7442b83a2b49c9a100a, type: 2}
   m_sharedMaterial: {fileID: 3936773736407537513, guid: ef8219c25e46a7442b83a2b49c9a100a, type: 2}
@@ -4539,7 +4539,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 00
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ef8219c25e46a7442b83a2b49c9a100a, type: 2}
   m_sharedMaterial: {fileID: 3936773736407537513, guid: ef8219c25e46a7442b83a2b49c9a100a, type: 2}
@@ -4969,7 +4969,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c0e592979c189f4bb0a1a0632a6495d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameData: {fileID: 0}
+  gameData: {fileID: 11400000, guid: a4ac7f392420c3d47b633200a62a9e0f, type: 2}
   size: {fileID: 2127909617}
   slider: {fileID: 399451604}
 --- !u!1001 &1330151768
@@ -5997,6 +5997,7 @@ MonoBehaviour:
   squareBlackPreFab: {fileID: 3687205964819395846, guid: cb336362857dd4c4db76ec10a0b301bb, type: 3}
   squareWhitePreFab: {fileID: 7039796178990604985, guid: aac7ec203c390484286c6fb3de607943, type: 3}
   lineRenderer: {fileID: 1533695524}
+  gameLogic: {fileID: 1533695527}
 --- !u!114 &1533695527
 MonoBehaviour:
   m_ObjectHideFlags: 0
