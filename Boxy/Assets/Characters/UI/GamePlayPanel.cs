@@ -60,11 +60,9 @@ public class GamePlayPanel : MonoBehaviour
 
     public void SaveGamePlay()
     {
-        SaveLoadData saveLoadData = new SaveLoadData
-        {
-            player1Name = player1NameDisplay.text,
-            player2Name = player2NameDisplay.text
-        };
+        string player1Name = player1NameDisplay.text;
+        string player2Name = player2NameDisplay.text;
+        SaveLoadData saveLoadData = new SaveLoadData(player1Name, player2Name);
 
         gamePlay.SaveGameData(saveLoadData);
 

@@ -7,6 +7,8 @@ public class GameLogic : MonoBehaviour
 {
     [SerializeField] private GamePlayPanel gamePlayPanel;
 
+    private int boardSize;
+
     // Board Walls
     //------------
     private SquareWall[,] wall;
@@ -22,13 +24,17 @@ public class GameLogic : MonoBehaviour
 
     public void Initialize(int boardSize)
     {
+        this.boardSize = boardSize;
+
         wall = new SquareWall[boardSize - 1, boardSize - 1];
         pegBoard = new Peg[boardSize, boardSize];
     }
 
-    public void SaveGameData(SaveLoadData saveLoadData, int boardSize)
+    public void SaveGameData(SaveLoadData saveLoadData)
     {
         string squares = "";
+
+        saveLoadData.boardSize = boardSize;
 
         // Save the squares that have been set to black or white
         for (int row = 0; row < boardSize - 1; row++)
@@ -150,6 +156,7 @@ public class GameLogic : MonoBehaviour
         if ((col >= 0) && (row >= 0) && (col < boardSize - 1) && (row < boardSize - 1))
         {
             if (wall[col, row].Add() && !loadMode)
+            //if (wall[col, row].Add())
             {
                 //Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
 
@@ -162,7 +169,7 @@ public class GameLogic : MonoBehaviour
 
                 //UpdateScore(gameState);
 
-                gamePlayPanel.UpdateScore(gameState);
+                UpdateScore(gameState);
 
                 //listOfGameObjects.Add(go);
 
@@ -171,6 +178,16 @@ public class GameLogic : MonoBehaviour
                 //AudioManager.Instance.SoundCompleteBox();
             }
         }
+    }
+
+    public void UpdateScore(GameState gameState)
+    {
+        gamePlayPanel.UpdateScore(gameState);
+    }
+
+    public void SetBoxState(int col, int row, GameState gameState)
+    {
+        wall[col, row].SetState(gameState);
     }
 
     public void UpdateWallCount(Peg pegStart, Peg pegEnd, GameObject square, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode, BoxPosList boxPosList)

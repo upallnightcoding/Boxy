@@ -67,7 +67,15 @@ public class SaveLoadData
     public Color GetColColor(int index) => 
         GetColLink(index) == PlayerColor.BLACK ? Color.black : Color.white;
 
-    public void Initialize()
+    public SaveLoadData(string player1Name, string player2Name)
+    {
+        Initialize();
+
+        this.player1Name = player1Name;
+        this.player2Name = player2Name;
+    }
+
+    private void Initialize()
     {
         player1Name = null;
         player2Name = null;

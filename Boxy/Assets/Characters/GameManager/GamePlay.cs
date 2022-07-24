@@ -81,11 +81,10 @@ public class GamePlay : MonoBehaviour
         this.boardSize = boardSize;
 
         gameLogic.Initialize(boardSize);
-
-        gameRenderer.DrawGameBoard(boardSize);
-
         wall = gameLogic.GetWalls();
         pegBoard = gameLogic.GetPegBoard();
+
+        gameRenderer.DrawGameBoard(boardSize);
         cameraPos.transform.position = gameRenderer.GetNewCameraPosition();
     }
 
@@ -105,11 +104,7 @@ public class GamePlay : MonoBehaviour
     /// <param name="saveLoadData"></param>
     public void SaveGameData(SaveLoadData saveLoadData)
     {
-        saveLoadData.Initialize();
-
-        saveLoadData.boardSize = boardSize;
-
-        gameLogic.SaveGameData(saveLoadData, boardSize);
+        gameLogic.SaveGameData(saveLoadData);
     }
 
     /// <summary>
@@ -129,6 +124,8 @@ public class GamePlay : MonoBehaviour
         string squares = saveLoadData.squares;
         int squareIndex = 0;
 
+        // Draw all boxes that loaded from the saved game
+        //-----------------------------------------------
         for (int row = 0; row < boardSize - 1; row++)
         {
             for (int col = 0; col < boardSize - 1; col++)
@@ -137,23 +134,23 @@ public class GamePlay : MonoBehaviour
 
                 if (squareColor != PlayerColor.EMPTY)
                 {
-                    /*Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
-
                     GameObject square = (squareColor == PlayerColor.BLACK) ? squareBlackPreFab : squareWhitePreFab;
 
-                    GameObject go = Instantiate(square, position, Quaternion.identity);
+                    GameState gameState = (squareColor == PlayerColor.BLACK) ? GameState.PLAYER1 : GameState.PLAYER2;
 
-                    gameRenderer.AddListOfGameObjects(go);*/
+                    gameRenderer.LoadBox(col, row, square, gameState);
 
-                    GameObject square = (squareColor == PlayerColor.BLACK) ? squareBlackPreFab : squareWhitePreFab;
+                    gameLogic.UpdateScore(gameState);
 
-                    gameRenderer.DrawBox(col, row, square);
+                    gameLogic.SetBoxState(col, row, gameState);
                 }
             }
         }
 
         int rowIndex = 0;
 
+        // Draw the horizontal links loaded from the saveed game
+        //------------------------------------------------------
         for (int row = 0; row < boardSize; row++)
         {
             for (int col = 0; col < boardSize - 1; col++)
@@ -161,7 +158,8 @@ public class GamePlay : MonoBehaviour
                 if (saveLoadData.IsRowLink(rowIndex)) 
                 {
                     Color color = saveLoadData.GetRowColor(rowIndex);
-                    RenderLink(pegBoard[col, row], pegBoard[col+1,row], color);
+                    GameState gameState = (saveLoadData.GetRowLink(rowIndex) == PlayerColor.BLACK) ? GameState.PLAYER1 : GameState.PLAYER2;
+                    RenderLink(pegBoard[col, row], pegBoard[col+1,row], color, gameState);
                 }
 
                 rowIndex++;
@@ -170,6 +168,8 @@ public class GamePlay : MonoBehaviour
 
         int colIndex = 0;
 
+        // Draw the vertical links loaded from the saved game
+        //---------------------------------------------------
         for (int col = 0; col < boardSize; col++)
         {
             for (int row = 0; row < boardSize - 1; row++)
@@ -177,7 +177,8 @@ public class GamePlay : MonoBehaviour
                 if (saveLoadData.IsColLink(colIndex))
                 {
                     Color color = saveLoadData.GetColColor(colIndex);
-                    RenderLink(pegBoard[col, row], pegBoard[col, row + 1], color);
+                    GameState gameState = (saveLoadData.GetColLink(colIndex) == PlayerColor.BLACK) ? GameState.PLAYER1 : GameState.PLAYER2;
+                    RenderLink(pegBoard[col, row], pegBoard[col, row + 1], color, gameState);
                 }
 
                 colIndex++;
@@ -227,14 +228,7 @@ public class GamePlay : MonoBehaviour
 
                 if (peg.IsOpen())
                 {
-                    //peg.Selected();
-
-                    //pegStart = peg;
-
                     selection = SelectionState.PIN;
-
-                    //lineRenderer.startColor = GetPlayerColor;
-                    //lineRenderer.endColor = GetPlayerColor;
 
                     gameRenderer.SetWallAnchorPeg(peg, GetPlayerColor());
                 }
@@ -262,7 +256,7 @@ public class GamePlay : MonoBehaviour
                 {
                     gameRenderer.RemoveLineRenderer();
 
-                    RenderLink(gameRenderer.GetStartPeg(), peg, GetPlayerColor());
+                    RenderLink(gameRenderer.GetStartPeg(), peg, GetPlayerColor(), gameState);
 
                     state = SelectionState.ANCHOR;
 
@@ -305,7 +299,7 @@ public class GamePlay : MonoBehaviour
         return (state);
     }
 
-    private void RenderLink(Peg pegStart, Peg pegEnd, Color color)
+    private void RenderLink(Peg pegStart, Peg pegEnd, Color color, GameState gameState)
     {
         GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
@@ -325,157 +319,14 @@ public class GamePlay : MonoBehaviour
     {
         boxPosList.ForEachBox(delegate (BoxPos boxPos)
         {
-            gameRenderer.DrawBox(boxPos, GetPlayer());
+            gameRenderer.DrawBox(boxPos, GetPlayer(), gameState);
         });
     }
-
-    /*private void UpDateSquareSideCount(Peg pegStart, Peg pegEnd)
-    {
-        GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
-
-        if (pegStart.Y == pegEnd.Y)
-        {
-            int col = Mathf.Min((int)pegStart.X, (int)pegEnd.X);
-            int row = (int)pegStart.Y;
-
-            gameLogic.AddOneToBoxSideCount(col, row, boardSize, wall, gameState, square, loadMode);
-            gameLogic.AddOneToBoxSideCount(col, row - 1, boardSize, wall, gameState, square, loadMode);
-        }
-
-        if (pegStart.X == pegEnd.X)
-        {
-            int col = (int)pegStart.X;
-            int row = Mathf.Min((int)pegStart.Y, (int)pegEnd.Y);
-
-            gameLogic.AddOneToBoxSideCount(col, row, boardSize, wall, gameState, square, loadMode);
-            gameLogic.AddOneToBoxSideCount(col - 1, row, boardSize, wall, gameState, square, loadMode);
-        }
-    }*/
-
-    /// <summary>
-    /// AddOneToBoxSideCount() - 
-    /// </summary>
-    /// <param name="col"></param>
-    /// <param name="row"></param>
-    /*private void AddOneToBoxSideCount(int col, int row)
-    {
-        if ((col >= 0) && (row >= 0) && (col < boardSize - 1) && (row < boardSize - 1))
-        {
-            if (wall[col, row].Add() && !loadMode)
-            {
-                Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
-
-                GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
-
-                GameObject go = Instantiate(square, position, Quaternion.identity);
-                go.name = $"Box: {col}, {row}";
-
-                //gameRenderer.DrawBox(col, row, gameState);
-
-                UpdateScore(gameState);
-
-                //listOfGameObjects.Add(go);
-
-                wall[col, row].SetState(gameState);
-
-                //AudioManager.Instance.SoundCompleteBox();
-            }
-        }
-    }*/
-
-    /*private void UpdateScore(GameState gameState)
-    {
-        gamePlayPanel.GetComponent<GamePlayPanel>().UpdateScore(gameState);
-    }*/
 
     private void ResetScore()
     {
         gamePlayPanel.GetComponent<GamePlayPanel>().ResetScore();
     }
-
-    /*private bool LegalMove(Peg pegStart, Peg pegEnd)
-    {
-        float c1 = pegStart.X;
-        float r1 = pegStart.Y;
-
-        float c2 = pegEnd.X;
-        float r2 = pegEnd.Y;
-
-        bool rowMove = (r1 == r2) && (Mathf.Abs(c1 - c2) == 1);
-        bool colMove = (c1 == c2) && (Mathf.Abs(r1 - r2) == 1);
-
-        bool duplicate = false;
-
-        if (rowMove)
-        {
-            if (c1 < c2)
-            {
-                duplicate = (pegStart.IsEastLinked && pegEnd.IsWestLinked);
-            }
-            else
-            {
-                duplicate = (pegStart.IsWestLinked && pegEnd.IsEastLinked);
-            }
-        }
-
-        if (colMove)
-        {
-            if (r1 < r2)
-            {
-                duplicate = (pegStart.IsNorthLinked && pegEnd.IsSouthLinked);
-            }
-            else
-            {
-                duplicate = (pegStart.IsSouthLinked && pegEnd.IsNorthLinked);
-            }
-        }
-
-        bool legalMove = rowMove || colMove;
-
-        return (legalMove && !duplicate);
-    }*/
-
-    /// <summary>
-    /// LinkPegs() - 
-    /// </summary>
-    /// <param name="p1"></param>
-    /// <param name="p2"></param>
-    /*private void LinkPegs(Peg p1, Peg p2)
-    {
-        float c1 = p1.X;
-        float r1 = p1.Y;
-
-        float c2 = p2.X;
-        float r2 = p2.Y;
-
-        if (r1 == r2)
-        {
-            if (c1 < c2)
-            {
-                p1.SetEast(gameState);
-                p2.SetWest(gameState);
-            }
-            else
-            {
-                p2.SetEast(gameState);
-                p1.SetWest(gameState);
-            }
-        }
-
-        if (c1 == c2)
-        {
-            if (r1 < r2)
-            {
-                p1.SetNorth(gameState);
-                p2.SetSouth(gameState);
-            }
-            else
-            {
-                p2.SetNorth(gameState);
-                p1.SetSouth(gameState);
-            }
-        }
-    }*/
 
     private void TogglePlayer()
     {
@@ -489,78 +340,6 @@ public class GamePlay : MonoBehaviour
             Destroy(go);
         }
     }
-
-    /*private void CreateAndRenderLink(Peg pegStart, Peg pegEnd, Color color)
-    {
-        GameObject go = new GameObject();
-        LineRenderer link = go.AddComponent<LineRenderer>();
-        link.material = drawLineMaterial;
-        link.startWidth = PEG_LINK_WIDTH;
-        link.endWidth = PEG_LINK_WIDTH;
-        link.useWorldSpace = true;
-        link.positionCount = 2;
-        link.SetPosition(0, pegStart.GetPosition);
-        link.SetPosition(1, pegEnd.GetPosition);
-        link.startColor = color;
-        link.endColor = color;
-        link.transform.parent = transform;
-
-        listOfGameObjects.Add(go);
-    }*/
-
-    /*private void DrawGameBoard()
-    {
-        for (int row = 0; row < boardSize; row++)
-        {
-            for (int col = 0; col < boardSize; col++)
-            {
-                CreateAndRenderPeg(col, row);
-            }
-        }
-
-        for (int row = 0; row < boardSize - 1; row++)
-        {
-            for (int col = 0; col < boardSize - 1; col++)
-            {
-                wall[col, row] = new SquareWall();
-            }
-        }
-
-        //Vector3 oldCameraPosition = cameraPos.transform.position;
-
-        float position = (boardSize - 1.0f) / 2.0f;
-        cameraPos.transform.position = new Vector3(position, position, -10.0f);
-
-        Vector3 delta = cameraPos.transform.position;
-
-        backGround1.transform.position = new Vector3(delta.x, delta.y, 0.0f);
-        backGround2.transform.position = new Vector3(delta.x, delta.y + 9.96f, 0.0f);
-    }*/
-
-    /// <summary>
-    /// CreateAndRenderPeg() - Create and renders a peg at the specified col
-    /// and column position.  The parent of the Peg is set as the transform
-    /// object.  The maximum number of links is determined by the col and row
-    /// position.  The peg is then placed in the list of objects to be deleted
-    /// at the end of the game.
-    /// </summary>
-    /// <param name="col"></param>
-    /// <param name="row"></param>
-    /*private void CreateAndRenderPeg(int col, int row)
-    {
-        GameObject go = Instantiate(pegPreFab, new Vector3(col, row, 0.0f), Quaternion.identity);
-        go.transform.parent = transform;
-
-        Peg peg = go.GetComponent<Peg>();
-        peg.Initialize();
-        peg.SetMaxLinks(col, row, boardSize);
-
-        pegBoard[col, row] = peg;
-
-        go.name = $"Peg: {col}, {row}, {peg.MaxLinks}";
-
-        listOfGameObjects.Add(go);
-    }*/
 }
 
 public class SquareWall

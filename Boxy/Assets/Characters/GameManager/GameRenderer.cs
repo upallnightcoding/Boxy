@@ -91,12 +91,16 @@ public class GameRenderer : MonoBehaviour
         listOfGameObjects.Add(go);
     }
 
-    public void DrawBox(BoxPos boxPos, GameObject square)
+    public void DrawBox(BoxPos boxPos, GameObject square, GameState gameState)
     {
-        DrawBox(boxPos.Col, boxPos.Row, square);
+        Vector3 position = new Vector3(boxPos.Col + 0.5f, boxPos.Row + 0.5f, 0.0f);
+
+        GameObject go = Instantiate(square, position, Quaternion.identity);
+
+        listOfGameObjects.Add(go);
     }
 
-    public void DrawBox(int col, int row, GameObject square)
+    public void LoadBox(int col, int row, GameObject square, GameState gameState)
     {
         Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
 
