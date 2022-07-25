@@ -141,12 +141,11 @@ public class GameRenderer : MonoBehaviour
                 go.transform.parent = transform;  // TODO Not sure this parent is right
 
                 Peg peg = go.GetComponent<Peg>();
-                peg.Initialize();
-                peg.SetMaxLinks(col, row, boardSize);
+                peg.Initialize(col, row, boardSize);
 
                 gameLogic.SetPegBoard(col, row, peg);
 
-                go.name = $"Peg: {col}, {row}, {peg.MaxLinks}";
+                go.name = $"Peg: {col}, {row}";
 
                 listOfGameObjects.Add(go);
             }

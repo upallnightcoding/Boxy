@@ -113,7 +113,7 @@ public class GamePlayPanel : MonoBehaviour
     {
         if (++squareCount == totalSquareCount)
         {
-            message.text = "You Tied";
+            message.text = "You won";
 
             if (playerUI[0].Score > playerUI[1].Score)
             {

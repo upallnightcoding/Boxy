@@ -140,9 +140,9 @@ public class GamePlay : MonoBehaviour
 
                     gameRenderer.LoadBox(col, row, square, gameState);
 
-                    gameLogic.UpdateScore(gameState);
+                    gameLogic.UpdateScore(col, row, gameState);
 
-                    gameLogic.SetBoxState(col, row, gameState);
+                    //gameLogic.SetBoxState(col, row, gameState);
                 }
             }
         }

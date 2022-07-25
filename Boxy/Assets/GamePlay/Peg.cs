@@ -9,16 +9,11 @@ public class Peg : MonoBehaviour
     public Sprite pegClosed;
     public Sprite pegIllegal;
 
-    private SpriteRenderer spriteRenderer;
-
-    private bool selected;
 
     public PegLink North;
     public PegLink South;
     public PegLink West;
     public PegLink East;
-
-    public int MaxLinks { set; get; } = 0;
 
     public Vector3 GetPosition => gameObject.transform.position;
     public int X => (int) gameObject.transform.position.x;
@@ -34,20 +29,19 @@ public class Peg : MonoBehaviour
     public string GetColorWest => West.GetColor;
     public string GetColorEast => East.GetColor;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     public void SetNorth(GameState player) { North.Set(player); }
     public void SetSouth(GameState player) { South.Set(player); }
     public void SetEast(GameState player) { East.Set(player); }
     public void SetWest(GameState player) { West.Set(player); }
 
-    public void Initialize()
+    private SpriteRenderer spriteRenderer;
+
+    private int MaxLinks = 0 ;
+
+    private bool selected;
+
+    public void Initialize(int col, int row, int boardSize)
     {
-        Debug.Log("Peg Initialize ...");
         selected = false;
 
         North = new PegLink();
@@ -56,10 +50,7 @@ public class Peg : MonoBehaviour
         West = new PegLink();
 
         spriteRenderer = GetComponent<SpriteRenderer>();
-    }
 
-    public void SetMaxLinks(int col, int row, int boardSize)
-    {
         MaxLinks = 4;
 
         if (row == 0 || row == (boardSize - 1))
@@ -76,6 +67,7 @@ public class Peg : MonoBehaviour
     public void Reset()
     {
         spriteRenderer.sprite = IsOpen() ? pegOpen : pegClosed;
+        selected = false;
     }
 
     public void Illegal()

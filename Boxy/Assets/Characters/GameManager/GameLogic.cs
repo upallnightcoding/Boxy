@@ -169,26 +169,28 @@ public class GameLogic : MonoBehaviour
 
                 //UpdateScore(gameState);
 
-                UpdateScore(gameState);
+                UpdateScore(col, row, gameState);
 
                 //listOfGameObjects.Add(go);
 
-                wall[col, row].SetState(gameState);
+                //wall[col, row].SetState(gameState);
 
                 //AudioManager.Instance.SoundCompleteBox();
             }
         }
     }
 
-    public void UpdateScore(GameState gameState)
+    public void UpdateScore(int col, int row, GameState gameState)
     {
         gamePlayPanel.UpdateScore(gameState);
-    }
 
-    public void SetBoxState(int col, int row, GameState gameState)
-    {
         wall[col, row].SetState(gameState);
     }
+
+    /*public void SetBoxState(int col, int row, GameState gameState)
+    {
+        wall[col, row].SetState(gameState);
+    }*/
 
     public void UpdateWallCount(Peg pegStart, Peg pegEnd, GameObject square, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode, BoxPosList boxPosList)
     {
