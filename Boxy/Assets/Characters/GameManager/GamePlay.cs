@@ -19,8 +19,7 @@ public class GamePlay : MonoBehaviour
     [SerializeField] private GameLogic gameLogic;
     [SerializeField] private GameAudio gameAudio;
 
-    //[SerializeField] GameObject backGround1;
-    //[SerializeField] GameObject backGround2;
+    [SerializeField] private MakePlayerMove makePlayerMove;
 
     [SerializeField] GameObject gamePlayPanel;
 
@@ -32,18 +31,11 @@ public class GamePlay : MonoBehaviour
     private bool leftMouseButton;
     private Vector3 mousePos;
 
-    private SquareWall[,] wall;
+    //private SquareWall[,] wall;
     private Peg[,] pegBoard;
-
-    private Peg illegalPeg = null;
-
-    //private Peg pegStart;
 
     // Initial Game State
     private GameState gameState = GameState.IDLE;
-    private SelectionState selectionState = SelectionState.ANCHOR;
-
-    //private List<GameObject> listOfGameObjects;
 
     private GameObject GetPlayer() => (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
@@ -56,15 +48,27 @@ public class GamePlay : MonoBehaviour
         leftMouseButton = Input.GetMouseButtonDown(LEFT_MOUSE_BUTTON);
         mousePos = Input.mousePosition;
 
+        GameMove gameMove = null;
+
         switch (gameState)
         {
             case GameState.IDLE:
                 break;
             case GameState.PLAYER1:
-                MakeMove();
+                gameMove = makePlayerMove.MakeMove(leftMouseButton, mousePos, gameState);
+                if (gameMove != null)
+                {
+                    RenderMove(gameMove.StartPeg, gameMove.EndPeg, GetPlayerColor(), gameState);
+                    TogglePlayer();
+                }
                 break;
             case GameState.PLAYER2:
-                MakeMove();
+                gameMove = makePlayerMove.MakeMove(leftMouseButton, mousePos, gameState);
+                if (gameMove != null)
+                {
+                    RenderMove(gameMove.StartPeg, gameMove.EndPeg, GetPlayerColor(), gameState);
+                    TogglePlayer();
+                }
                 break;
             case GameState.STOP:
                 break;
@@ -78,7 +82,6 @@ public class GamePlay : MonoBehaviour
     public void StartGamePlay(int boardSize)
     {
         gameState = GameState.PLAYER1;
-        selectionState = SelectionState.ANCHOR;
         this.boardSize = boardSize;
 
         gameLogic.Initialize(boardSize);
@@ -160,7 +163,7 @@ public class GamePlay : MonoBehaviour
                 {
                     Color color = saveLoadData.GetRowColor(rowIndex);
                     GameState gameState = (saveLoadData.GetRowLink(rowIndex) == PlayerColor.BLACK) ? GameState.PLAYER1 : GameState.PLAYER2;
-                    RenderLink(pegBoard[col, row], pegBoard[col+1,row], color, gameState);
+                    RenderMove(pegBoard[col, row], pegBoard[col+1,row], color, gameState);
                 }
 
                 rowIndex++;
@@ -179,7 +182,7 @@ public class GamePlay : MonoBehaviour
                 {
                     Color color = saveLoadData.GetColColor(colIndex);
                     GameState gameState = (saveLoadData.GetColLink(colIndex) == PlayerColor.BLACK) ? GameState.PLAYER1 : GameState.PLAYER2;
-                    RenderLink(pegBoard[col, row], pegBoard[col, row + 1], color, gameState);
+                    RenderMove(pegBoard[col, row], pegBoard[col, row + 1], color, gameState);
                 }
 
                 colIndex++;
@@ -189,126 +192,12 @@ public class GamePlay : MonoBehaviour
         loadMode = false;
     }
 
-    private void BoxyMove()
+    private void TogglePlayer()
     {
-
+        gameState = (gameState == GameState.PLAYER1) ? GameState.PLAYER2 : GameState.PLAYER1;
     }
 
-    private void MakeMove()
-    {
-        switch (selectionState)
-        {
-            case SelectionState.ANCHOR:
-                selectionState = SelectAnchorPeg();
-                break;
-            case SelectionState.PIN:
-                selectionState = SelectPinPeg();
-
-                switch (selectionState)
-                {
-                    case SelectionState.ANCHOR:
-                        TogglePlayer();
-                        break;
-                    case SelectionState.CANCEL:
-                        selectionState = SelectionState.ANCHOR;
-                        break;
-                }
-
-                break;
-        }
-    }
-
-    private SelectionState SelectAnchorPeg()
-    {
-        SelectionState selection = SelectionState.ANCHOR;
-
-        if (leftMouseButton)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(mousePos);
-
-            RaycastHit2D hits = Physics2D.GetRayIntersection(ray);
-
-            if (hits.collider != null)
-            {
-                Peg peg = hits.collider.GetComponent<Peg>();
-
-                if (peg.IsOpen())
-                {
-                    selection = SelectionState.PIN;
-
-                    gameRenderer.SetWallAnchorPeg(peg, GetPlayerColor());
-
-                    gameAudio.PlaySelectedAnchorPeg();
-                }
-            }
-        }
-
-        return (selection);
-    }
-
-    private SelectionState SelectPinPeg()
-    {
-        SelectionState state = SelectionState.PIN;
-
-        Ray ray = Camera.main.ScreenPointToRay(mousePos);
-
-        if (leftMouseButton)
-        {
-            RaycastHit2D hits = Physics2D.GetRayIntersection(ray);
-
-            if (hits.collider != null)
-            {
-                Peg peg = hits.collider.GetComponent<Peg>();
-
-                if (peg.IsOpen() && gameLogic.LegalMove(gameRenderer.GetStartPeg(), peg))
-                {
-                    gameRenderer.RemoveLineRenderer();
-
-                    RenderLink(gameRenderer.GetStartPeg(), peg, GetPlayerColor(), gameState);
-
-                    state = SelectionState.ANCHOR;
-
-                    gameAudio.PlaySelectedPinPeg();
-                }
-            }
-            else
-            {
-                gameRenderer.RemoveLineRenderer();
-
-                gameRenderer.GetStartPeg().Reset();
-
-                state = SelectionState.CANCEL;
-            }
-        }
-        else
-        {
-            gameRenderer.AnimateRenderLine(ray.GetPoint(0.0f));
-
-            RaycastHit2D hits = Physics2D.GetRayIntersection(ray);
-
-            if (hits.collider != null)
-            {
-                Peg peg = hits.collider.GetComponent<Peg>();
-
-                if (!gameLogic.LegalMove(gameRenderer.GetStartPeg(), peg))
-                {
-                    peg.Illegal();
-
-                    illegalPeg = peg;
-
-                    //gameAudio.PlaySelectedErrorPeg();
-                }
-            } else
-            {
-                illegalPeg?.Reset();
-                illegalPeg = null;
-            }
-        }
-
-        return (state);
-    }
-
-    private void RenderLink(Peg pegStart, Peg pegEnd, Color color, GameState gameState)
+    private void RenderMove(Peg pegStart, Peg pegEnd, Color color, GameState gameState)
     {
         GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
 
@@ -317,7 +206,7 @@ public class GamePlay : MonoBehaviour
         gameRenderer.DrawWall(pegStart, pegEnd, color);
 
         gameLogic.LinkPegs(pegStart, pegEnd, gameState);
-        gameLogic.UpdateWallCount(pegStart, pegEnd, square, boardSize, wall, gameState, loadMode, boxPosList);
+        gameLogic.UpdateWallCount(pegStart, pegEnd, square, boardSize, gameState, loadMode, boxPosList);
         CheckBoxCount(boxPosList);
 
         pegStart.Reset();
@@ -342,10 +231,7 @@ public class GamePlay : MonoBehaviour
         gamePlayPanel.GetComponent<GamePlayPanel>().ResetScore();
     }
 
-    private void TogglePlayer()
-    {
-        gameState = (gameState == GameState.PLAYER1) ? GameState.PLAYER2 : GameState.PLAYER1;
-    }
+ 
 
     public void EndGamePlay()
     {
@@ -405,10 +291,4 @@ public enum GameState
     STOP = 5
 }
 
-public enum SelectionState
-{
-    ANCHOR,
-    PIN,
-    COMPLETE,
-    CANCEL
-}
+

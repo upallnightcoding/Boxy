@@ -536,7 +536,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: f58abfe64cd9ff54590e7b617639f87f, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1493,7 +1493,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 63cae176ac6b7094493b5e1e403139fe, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -2067,7 +2067,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: f0fc5dfd78b4d5d4596a068108725c4c, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -6430,6 +6430,7 @@ GameObject:
   - component: {fileID: 1533695526}
   - component: {fileID: 1533695527}
   - component: {fileID: 1533695528}
+  - component: {fileID: 1533695529}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -6582,6 +6583,7 @@ MonoBehaviour:
   gameRenderer: {fileID: 1533695526}
   gameLogic: {fileID: 1533695527}
   gameAudio: {fileID: 1533695528}
+  makePlayerMove: {fileID: 1533695529}
   gamePlayPanel: {fileID: 373515592}
 --- !u!114 &1533695526
 MonoBehaviour:
@@ -6631,6 +6633,23 @@ MonoBehaviour:
   selectedAnchorPeg: {fileID: 151785628}
   selectedPinPeg: {fileID: 273606214}
   createBox: {fileID: 384062798}
+--- !u!114 &1533695529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533695521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca273e62c705f3f4a89f02f3b9f42c46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameRenderer: {fileID: 1533695526}
+  gameAudio: {fileID: 1533695528}
+  gameLogic: {fileID: 1533695527}
+  squareBlackPreFab: {fileID: 3687205964819395846, guid: cb336362857dd4c4db76ec10a0b301bb, type: 3}
+  squareWhitePreFab: {fileID: 7039796178990604985, guid: aac7ec203c390484286c6fb3de607943, type: 3}
 --- !u!224 &1614032562 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1427531142227220483, guid: bff1a67e03bd25a4fb9a2e8451a665ab, type: 3}

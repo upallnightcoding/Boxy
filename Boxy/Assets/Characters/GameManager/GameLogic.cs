@@ -151,12 +151,35 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    public void BoxyMove()
+    public void UpdateScore(int col, int row, GameState gameState)
     {
+        gamePlayPanel.UpdateScore(gameState);
 
+        wall[col, row].SetState(gameState);
     }
 
-    private void AddOneToWallCount(int col, int row, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode, BoxPosList boxPosList)
+    public void UpdateWallCount(Peg pegStart, Peg pegEnd, GameObject square, int boardSize, GameState gameState, bool loadMode, BoxPosList boxPosList)
+    {
+        if (pegStart.Y == pegEnd.Y)
+        {
+            int col = Mathf.Min((int)pegStart.X, (int)pegEnd.X);
+            int row = (int)pegStart.Y;
+
+            AddOneToWallCount(col, row, boardSize, gameState, loadMode, boxPosList);
+            AddOneToWallCount(col, row - 1, boardSize, gameState, loadMode, boxPosList);
+        }
+
+        if (pegStart.X == pegEnd.X)
+        {
+            int col = (int)pegStart.X;
+            int row = Mathf.Min((int)pegStart.Y, (int)pegEnd.Y);
+
+            AddOneToWallCount(col, row, boardSize, gameState, loadMode, boxPosList);
+            AddOneToWallCount(col - 1, row, boardSize, gameState, loadMode, boxPosList);
+        }
+    }
+
+    private void AddOneToWallCount(int col, int row, int boardSize, GameState gameState, bool loadMode, BoxPosList boxPosList)
     {
         if ((col >= 0) && (row >= 0) && (col < boardSize - 1) && (row < boardSize - 1))
         {
@@ -166,34 +189,6 @@ public class GameLogic : MonoBehaviour
 
                 UpdateScore(col, row, gameState);
             }
-        }
-    }
-
-    public void UpdateScore(int col, int row, GameState gameState)
-    {
-        gamePlayPanel.UpdateScore(gameState);
-
-        wall[col, row].SetState(gameState);
-    }
-
-    public void UpdateWallCount(Peg pegStart, Peg pegEnd, GameObject square, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode, BoxPosList boxPosList)
-    {
-        if (pegStart.Y == pegEnd.Y)
-        {
-            int col = Mathf.Min((int)pegStart.X, (int)pegEnd.X);
-            int row = (int)pegStart.Y;
-
-            AddOneToWallCount(col, row, boardSize, wall, gameState, loadMode, boxPosList);
-            AddOneToWallCount(col, row - 1, boardSize, wall, gameState, loadMode, boxPosList);
-        }
-
-        if (pegStart.X == pegEnd.X)
-        {
-            int col = (int)pegStart.X;
-            int row = Mathf.Min((int)pegStart.Y, (int)pegEnd.Y);
-
-            AddOneToWallCount(col, row, boardSize, wall, gameState, loadMode, boxPosList);
-            AddOneToWallCount(col - 1, row, boardSize, wall, gameState, loadMode, boxPosList);
         }
     }
 }

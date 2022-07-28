@@ -16,15 +16,7 @@ public class GameRenderer : MonoBehaviour
 
     [SerializeField] private GameLogic gameLogic;
 
-    // Board Walls
-    //------------
-    //private SquareWall[,] wall;
-
-    // Peg Board
-    //----------
-    //private Peg[,] pegBoard;
-
-    private Peg pegStart;
+    //private Peg pegStart;
 
     // Calculated new camera position over peg board
     //----------------------------------------------
@@ -38,7 +30,6 @@ public class GameRenderer : MonoBehaviour
     //-----------------------
     public Vector3 GetNewCameraPosition() => newCameraPosition;
     public List<GameObject> GetListOfGameObjects() => listOfGameObjects;
-    public Peg GetStartPeg() => pegStart;
     public void AddListOfGameObjects(GameObject go) => listOfGameObjects.Add(go);
 
     public void DrawGameBoard(int boardSize)
@@ -52,39 +43,38 @@ public class GameRenderer : MonoBehaviour
         PositionCameraAndBackGround(boardSize);
     }
 
-    public void SetWallAnchorPeg(Peg peg, Color color)
+    public void SetWallAnchorPeg(Peg startPeg, Color color)
     {
         lineRenderer.startColor = color;
         lineRenderer.endColor = color;
 
-        pegStart = peg;
-        pegStart.Selected();
+        startPeg.Selected();
     }
 
-    public void AnimateRenderLine(Vector3 position)
+    public void AnimateRenderLine(Peg startPeg, Vector3 position)
     {
-        lineRenderer.SetPosition(0, pegStart.GetPosition);
+        lineRenderer.SetPosition(0, startPeg.GetPosition);
         lineRenderer.SetPosition(1, position);
     }
 
-    public void RemoveLineRenderer()
+    public void RemoveLineRenderer(Peg startPeg)
     {
-        lineRenderer.SetPosition(0, pegStart.GetPosition);
-        lineRenderer.SetPosition(1, pegStart.GetPosition);
+        lineRenderer.SetPosition(0, startPeg.GetPosition);
+        lineRenderer.SetPosition(1, startPeg.GetPosition);
     }
 
-    public void DrawWall(Peg pegStart, Peg pegEnd, Color color)
+    public void DrawWall(Peg startPeg, Peg endPeg, Color color)
     {
         GameObject go = new GameObject();
-        go.name = $"Link: {pegStart.name} to {pegEnd.name}";
+        go.name = $"Link: {startPeg.name} to {endPeg.name}";
         LineRenderer link = go.AddComponent<LineRenderer>();
         link.material = drawLineMaterial;
         link.startWidth = PEG_LINK_WIDTH;
         link.endWidth = PEG_LINK_WIDTH;
         link.useWorldSpace = true;
         link.positionCount = 2;
-        link.SetPosition(0, pegStart.GetPosition);
-        link.SetPosition(1, pegEnd.GetPosition);
+        link.SetPosition(0, startPeg.GetPosition);
+        link.SetPosition(1, endPeg.GetPosition);
         link.startColor = color;
         link.endColor = color;
         link.transform.parent = transform;
