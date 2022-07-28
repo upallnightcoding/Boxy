@@ -17,6 +17,7 @@ public class GamePlay : MonoBehaviour
 
     [SerializeField] private GameRenderer gameRenderer;
     [SerializeField] private GameLogic gameLogic;
+    [SerializeField] private GameAudio gameAudio;
 
     //[SerializeField] GameObject backGround1;
     //[SerializeField] GameObject backGround2;
@@ -188,6 +189,11 @@ public class GamePlay : MonoBehaviour
         loadMode = false;
     }
 
+    private void BoxyMove()
+    {
+
+    }
+
     private void MakeMove()
     {
         switch (selectionState)
@@ -231,6 +237,8 @@ public class GamePlay : MonoBehaviour
                     selection = SelectionState.PIN;
 
                     gameRenderer.SetWallAnchorPeg(peg, GetPlayerColor());
+
+                    gameAudio.PlaySelectedAnchorPeg();
                 }
             }
         }
@@ -260,7 +268,7 @@ public class GamePlay : MonoBehaviour
 
                     state = SelectionState.ANCHOR;
 
-                    //AudioManager.Instance.SoundLegalMove();
+                    gameAudio.PlaySelectedPinPeg();
                 }
             }
             else
@@ -287,7 +295,8 @@ public class GamePlay : MonoBehaviour
                     peg.Illegal();
 
                     illegalPeg = peg;
-                    //AudioManager.Instance.SoundIllegalMove();
+
+                    //gameAudio.PlaySelectedErrorPeg();
                 }
             } else
             {
@@ -317,6 +326,11 @@ public class GamePlay : MonoBehaviour
 
     private void CheckBoxCount(BoxPosList boxPosList)
     {
+        if (boxPosList.HasCount())
+        {
+            gameAudio.PlayCreateBox();
+        }
+
         boxPosList.ForEachBox(delegate (BoxPos boxPos)
         {
             gameRenderer.DrawBox(boxPos, GetPlayer(), gameState);

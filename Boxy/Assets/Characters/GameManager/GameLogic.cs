@@ -151,31 +151,20 @@ public class GameLogic : MonoBehaviour
         }
     }
 
+    public void BoxyMove()
+    {
+
+    }
+
     private void AddOneToWallCount(int col, int row, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode, BoxPosList boxPosList)
     {
         if ((col >= 0) && (row >= 0) && (col < boardSize - 1) && (row < boardSize - 1))
         {
             if (wall[col, row].Add() && !loadMode)
-            //if (wall[col, row].Add())
             {
-                //Vector3 position = new Vector3(col + 0.5f, row + 0.5f, 0.0f);
-
-                //GameObject go = Instantiate(square, position, Quaternion.identity);
-                //go.name = $"Box: {col}, {row}";
-
                 boxPosList.Add(col, row);
 
-                //gameRenderer.DrawBox(col, row, gameState);
-
-                //UpdateScore(gameState);
-
                 UpdateScore(col, row, gameState);
-
-                //listOfGameObjects.Add(go);
-
-                //wall[col, row].SetState(gameState);
-
-                //AudioManager.Instance.SoundCompleteBox();
             }
         }
     }
@@ -187,15 +176,8 @@ public class GameLogic : MonoBehaviour
         wall[col, row].SetState(gameState);
     }
 
-    /*public void SetBoxState(int col, int row, GameState gameState)
-    {
-        wall[col, row].SetState(gameState);
-    }*/
-
     public void UpdateWallCount(Peg pegStart, Peg pegEnd, GameObject square, int boardSize, SquareWall[,] wall, GameState gameState, bool loadMode, BoxPosList boxPosList)
     {
-        //GameObject square = (gameState == GameState.PLAYER1) ? squareBlackPreFab : squareWhitePreFab;
-
         if (pegStart.Y == pegEnd.Y)
         {
             int col = Mathf.Min((int)pegStart.X, (int)pegEnd.X);
@@ -218,21 +200,23 @@ public class GameLogic : MonoBehaviour
 
 public class BoxPosList
 {
-    private List<BoxPos> list;
+    private List<BoxPos> listOfBoxPos;
+
+    public bool HasCount() => (listOfBoxPos.Count > 0);
 
     public BoxPosList()
     {
-        list = new List<BoxPos>();
+        listOfBoxPos = new List<BoxPos>();
     }
 
     public void Add(int col, int row)
     {
-        list.Add(new BoxPos(col, row));
+        listOfBoxPos.Add(new BoxPos(col, row));
     }
 
     public void ForEachBox(Action<BoxPos> action)
     {
-        list.ForEach(action);
+        listOfBoxPos.ForEach(action);
     }
 }
 

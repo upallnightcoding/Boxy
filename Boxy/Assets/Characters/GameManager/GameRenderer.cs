@@ -76,6 +76,7 @@ public class GameRenderer : MonoBehaviour
     public void DrawWall(Peg pegStart, Peg pegEnd, Color color)
     {
         GameObject go = new GameObject();
+        go.name = $"Link: {pegStart.name} to {pegEnd.name}";
         LineRenderer link = go.AddComponent<LineRenderer>();
         link.material = drawLineMaterial;
         link.startWidth = PEG_LINK_WIDTH;
@@ -145,7 +146,7 @@ public class GameRenderer : MonoBehaviour
 
                 gameLogic.SetPegBoard(col, row, peg);
 
-                go.name = $"Peg: {col}, {row}";
+                go.name = $"Peg: ({col}, {row})";
 
                 listOfGameObjects.Add(go);
             }
