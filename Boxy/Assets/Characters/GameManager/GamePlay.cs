@@ -20,6 +20,7 @@ public class GamePlay : MonoBehaviour
     [SerializeField] private GameAudio gameAudio;
 
     [SerializeField] private MakePlayerMove makePlayerMove;
+    [SerializeField] private MakeBoxyMove makeBoxyMove;
 
     [SerializeField] GameObject gamePlayPanel;
 
@@ -27,9 +28,12 @@ public class GamePlay : MonoBehaviour
 
     private bool loadMode = false;
 
+    private GameLevel gameLevel = GameLevel.EASY;
+    private GameMode gameMode = GameMode.ONE_PLAYER;
+
     // Input Control Attributes
-    private bool leftMouseButton;
-    private Vector3 mousePos;
+    //private bool leftMouseButton;
+    //private Vector3 mousePos;
 
     //private SquareWall[,] wall;
     private Peg[,] pegBoard;
@@ -45,47 +49,81 @@ public class GamePlay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        leftMouseButton = Input.GetMouseButtonDown(LEFT_MOUSE_BUTTON);
-        mousePos = Input.mousePosition;
+        bool leftMouseButton = Input.GetMouseButtonDown(LEFT_MOUSE_BUTTON);
+        Vector3 mousePos = Input.mousePosition;
 
-        GameMove gameMove = null;
-
-        switch (gameState)
+        switch (gameState)     
         {
             case GameState.IDLE:
                 break;
             case GameState.PLAYER1:
-                gameMove = makePlayerMove.MakeMove(leftMouseButton, mousePos, gameState);
-                if (gameMove != null)
-                {
-                    RenderMove(gameMove.StartPeg, gameMove.EndPeg, GetPlayerColor(), gameState);
-                    TogglePlayer();
-                }
+                PlayerMove(leftMouseButton, mousePos);
                 break;
             case GameState.PLAYER2:
-                gameMove = makePlayerMove.MakeMove(leftMouseButton, mousePos, gameState);
-                if (gameMove != null)
-                {
-                    RenderMove(gameMove.StartPeg, gameMove.EndPeg, GetPlayerColor(), gameState);
-                    TogglePlayer();
-                }
+                OppenentsMove(leftMouseButton, mousePos);
                 break;
             case GameState.STOP:
                 break;
         }
     }
 
+    private void PlayerMove(bool leftMouseButton, Vector3 mousePos)
+    {
+        GameMove gameMove = makePlayerMove.MakeMove(leftMouseButton, mousePos, gameState);
+
+        if (gameMove != null)
+        {
+            RenderMove(gameMove.StartPeg, gameMove.EndPeg, GetPlayerColor(), gameState);
+            TogglePlayer();
+        }
+    }
+
+    private void OppenentsMove(bool leftMouseButton, Vector3 mousePos)
+    {
+        GameMove gameMove = null;
+
+        if (gameMode == GameMode.TWO_PLAYER)
+        {
+            gameMove = makePlayerMove.MakeMove(leftMouseButton, mousePos, gameState);
+        } else
+        {
+            switch (gameLevel)
+            {
+                case GameLevel.EASY:
+                    gameMove = makeBoxyMove.MakeEasyMove(gameState);
+                    break;
+                case GameLevel.MEDIUM:
+                    gameMove = makeBoxyMove.MakeMediumMove(gameState);
+                    break;
+                case GameLevel.HARD:
+                    break;
+            }
+        }
+
+        if (gameMove != null)
+        {
+            RenderMove(gameMove.StartPeg, gameMove.EndPeg, GetPlayerColor(), gameState);
+        }
+        else
+        {
+            Debug.Log("Failed to Move ...");
+        }
+
+        TogglePlayer();
+    }
+
     /// <summary>
     /// StartGamePlay() - 
     /// </summary>
     /// <param name="gameData"></param>
-    public void StartGamePlay(int boardSize)
+    public void StartGamePlay(int boardSize, GameMode gameMode, GameLevel gameLevel)
     {
         gameState = GameState.PLAYER1;
         this.boardSize = boardSize;
+        this.gameLevel = gameLevel;
+        this.gameMode = gameMode;
 
         gameLogic.Initialize(boardSize);
-        wall = gameLogic.GetWalls();
         pegBoard = gameLogic.GetPegBoard();
 
         gameRenderer.DrawGameBoard(boardSize);
@@ -123,7 +161,7 @@ public class GamePlay : MonoBehaviour
 
         boardSize = saveLoadData.boardSize;
 
-        StartGamePlay(boardSize);
+        StartGamePlay(boardSize, GameMode.ONE_PLAYER, GameLevel.EASY);
 
         string squares = saveLoadData.squares;
         int squareIndex = 0;
@@ -242,13 +280,16 @@ public class GamePlay : MonoBehaviour
     }
 }
 
-public class SquareWall
+public class SquareBox
 {
     public string State { get; private set; }
 
-    private int count;
+    public int count = 0;
 
-    public SquareWall()
+    public int GetCount() => count;
+    public bool IsOpen() => count < 4;
+
+    public SquareBox()
     {
         count = 0;
         State = PlayerColor.EMPTY;
@@ -291,4 +332,15 @@ public enum GameState
     STOP = 5
 }
 
+public enum GameLevel
+{
+    EASY = 0,
+    MEDIUM = 1,
+    HARD = 2
+}
 
+public enum GameMode
+{
+    ONE_PLAYER,
+    TWO_PLAYER
+}

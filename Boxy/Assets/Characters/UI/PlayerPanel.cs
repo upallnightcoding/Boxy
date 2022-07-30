@@ -43,11 +43,13 @@ public class PlayerPanel : MonoBehaviour
     {
         twoPlayerContainer.SetActive(false);
         gameObject.SetActive(true);
+        gameData.mode = GameMode.ONE_PLAYER;
     }
 
     public void TwoPlayerGame()
     {
         twoPlayerContainer.SetActive(true);
         gameObject.SetActive(true);
+        gameData.mode = GameMode.TWO_PLAYER;
     }
 }

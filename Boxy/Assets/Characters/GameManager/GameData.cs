@@ -11,6 +11,8 @@ public class GameData : ScriptableObject
 
     [Header("Game Variables")]
     public int BoardSize = -1;
+    public GameLevel level = GameLevel.EASY;
+    public GameMode mode = GameMode.ONE_PLAYER;
 
     // Contains Save & Load Data
     public SaveLoadData saveLoadData = null;

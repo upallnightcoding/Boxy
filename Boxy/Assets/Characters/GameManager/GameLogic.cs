@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 public class GameLogic : MonoBehaviour
 {
@@ -11,22 +12,22 @@ public class GameLogic : MonoBehaviour
 
     // Board Walls
     //------------
-    private SquareWall[,] wall;
+    private SquareBox[,] wall;
 
     // Peg Board
     //----------
     private Peg[,] pegBoard;
 
-    public SquareWall[,] GetWalls() => wall;
+    public SquareBox[,] GetWalls() => wall;
     public Peg[,] GetPegBoard() => pegBoard;
     public void SetPegBoard(int col, int row, Peg peg) => pegBoard[col, row] = peg;
-    public void InitWall(int col, int row) => wall[col, row] = new SquareWall();
+    public void InitWall(int col, int row) => wall[col, row] = new SquareBox();
 
     public void Initialize(int boardSize)
     {
         this.boardSize = boardSize;
 
-        wall = new SquareWall[boardSize - 1, boardSize - 1];
+        wall = new SquareBox[boardSize - 1, boardSize - 1];
         pegBoard = new Peg[boardSize, boardSize];
     }
 
@@ -70,6 +71,31 @@ public class GameLogic : MonoBehaviour
         }
 
         saveLoadData.colLinks = colLinks;
+    }
+
+    public BoxPos SelectRandonBox(int value)
+    {
+        BoxPosList boxPosList = new BoxPosList();
+
+        for (int row = 0; row < boardSize - 1; row++)
+        {
+            for (int col = 0; col < boardSize - 1; col++)
+            {
+                if (wall[col, row].IsOpen())
+                {
+                    if (value == -1)
+                    {
+                        boxPosList.Add(col, row);
+                    }
+                    else if (wall[col, row].GetCount() == value)
+                    {
+                        boxPosList.Add(col, row);
+                    }
+                }
+            }
+        }
+
+        return (boxPosList.PickRandomBox());
     }
 
     public bool LegalMove(Peg pegStart, Peg pegEnd)
@@ -191,6 +217,52 @@ public class GameLogic : MonoBehaviour
             }
         }
     }
+
+    public WallDirection GetRandomWall(BoxPos boxPos)
+    {
+        WallDirection direction = WallDirection.UNKNOWN;
+        int col = boxPos.Col;
+        int row = boxPos.Row;
+
+        List<WallDirection> directions = new List<WallDirection>();
+
+        if (!pegBoard[col, row].North.IsLinked) directions.Add(WallDirection.WEST);
+        if (!pegBoard[col, row].East.IsLinked) directions.Add(WallDirection.SOUTH);
+        if (!pegBoard[col+1, row+1].West.IsLinked) directions.Add(WallDirection.NORTH);
+        if (!pegBoard[col+1, row+1].South.IsLinked) directions.Add(WallDirection.EAST);
+
+        if (directions.Count > 0)
+        {
+            direction = directions[UnityEngine.Random.Range(0, directions.Count)];
+        }
+
+        return (direction);
+    }
+
+    public GameMove CreateMove(BoxPos boxPos, WallDirection direction)
+    {
+        GameMove gameMove = null;
+        int c = boxPos.Col;
+        int r = boxPos.Row;
+
+        switch(direction)
+        {
+            case WallDirection.NORTH:
+                gameMove = new GameMove(pegBoard[c, r + 1], pegBoard[c+1, r+1]);
+                break;
+            case WallDirection.SOUTH:
+                gameMove = new GameMove(pegBoard[c, r], pegBoard[c + 1, r]);
+                break;
+            case WallDirection.EAST:
+                gameMove = new GameMove(pegBoard[c + 1, r], pegBoard[c + 1, r + 1]);
+                break;
+            case WallDirection.WEST:
+                gameMove = new GameMove(pegBoard[c, r], pegBoard[c, r + 1]);
+                break;
+        }
+
+        return (gameMove);
+    }
 }
 
 public class BoxPosList
@@ -213,6 +285,18 @@ public class BoxPosList
     {
         listOfBoxPos.ForEach(action);
     }
+
+    public BoxPos PickRandomBox()
+    {
+        BoxPos boxPos = null;
+
+        if (HasCount())
+        {
+            boxPos = listOfBoxPos[UnityEngine.Random.Range(0, listOfBoxPos.Count)];
+        }
+
+        return (boxPos);
+    }
 }
 
 public class BoxPos
@@ -225,4 +309,13 @@ public class BoxPos
         this.Col = col;
         this.Row = row;
     }
+}
+
+public enum WallDirection
+{
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST,
+    UNKNOWN
 }
