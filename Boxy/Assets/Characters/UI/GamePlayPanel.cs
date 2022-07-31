@@ -21,6 +21,8 @@ public class GamePlayPanel : MonoBehaviour
     [SerializeField] private TMP_Text winPanelName;
     [SerializeField] private TMP_Text message;
 
+    [SerializeField] private TMP_Text gameLevel;
+
     private int squareCount = 0;
     private int boardSize = 0;
     private int totalSquareCount = 0;
@@ -44,6 +46,8 @@ public class GamePlayPanel : MonoBehaviour
 
         boardSize = gameData.BoardSize;
         totalSquareCount = (boardSize - 1) * (boardSize - 1);
+
+        gameLevel.text = (gameData.mode == GameMode.ONE_PLAYER) ? gameData.level.ToString() : "";
 
         gamePlay.StartGamePlay(boardSize, gameData.mode, gameData.level);
     }

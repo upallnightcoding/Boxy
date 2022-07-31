@@ -103,13 +103,8 @@ public class GamePlay : MonoBehaviour
         if (gameMove != null)
         {
             RenderMove(gameMove.StartPeg, gameMove.EndPeg, GetPlayerColor(), gameState);
+            TogglePlayer();
         }
-        else
-        {
-            Debug.Log("Failed to Move ...");
-        }
-
-        TogglePlayer();
     }
 
     /// <summary>
@@ -245,6 +240,7 @@ public class GamePlay : MonoBehaviour
 
         gameLogic.LinkPegs(pegStart, pegEnd, gameState);
         gameLogic.UpdateWallCount(pegStart, pegEnd, square, boardSize, gameState, loadMode, boxPosList);
+
         CheckBoxCount(boxPosList);
 
         pegStart.Reset();

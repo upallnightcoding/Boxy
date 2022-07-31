@@ -9,17 +9,16 @@ public class PlayerPanel : MonoBehaviour
     [SerializeField] private GameData gameData;
     [SerializeField] private GamePlayPanel gamePlayPanel;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     public void StartGame()
     {
         gameObject.SetActive(false);
 
         gamePlayPanel.StartGamePlay();
+    }
+
+    public void StartNextGame()
+    {
+        gameObject.SetActive(true);
     }
 
     public void LoadGame()
