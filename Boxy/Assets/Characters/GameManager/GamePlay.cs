@@ -24,6 +24,8 @@ public class GamePlay : MonoBehaviour
 
     [SerializeField] GameObject gamePlayPanel;
 
+    [SerializeField] private ParticleSystem boxyMovePS;
+
     private int boardSize;
 
     private bool loadMode = false;
@@ -96,6 +98,7 @@ public class GamePlay : MonoBehaviour
                     gameMove = makeBoxyMove.MakeMediumMove(gameState);
                     break;
                 case GameLevel.HARD:
+                    gameMove = makeBoxyMove.MakeHardMove(gameState);
                     break;
             }
         }
@@ -103,8 +106,16 @@ public class GamePlay : MonoBehaviour
         if (gameMove != null)
         {
             RenderMove(gameMove.StartPeg, gameMove.EndPeg, GetPlayerColor(), gameState);
+            RenderMoveAnimation(gameMove.StartPeg, gameMove.EndPeg);
             TogglePlayer();
         }
+    }
+
+    private void RenderMoveAnimation(Peg startPeg, Peg endPeg)
+    {
+        Vector3 position = (startPeg.transform.position + endPeg.transform.position) / 2.0f;
+        boxyMovePS.gameObject.transform.position = position;
+        boxyMovePS.Play();
     }
 
     /// <summary>

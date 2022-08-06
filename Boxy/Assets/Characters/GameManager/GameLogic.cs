@@ -73,6 +73,25 @@ public class GameLogic : MonoBehaviour
         saveLoadData.colLinks = colLinks;
     }
 
+    public GameMove MakeBoxyMove(int value)
+    {
+        GameMove gameMove = null;
+
+        BoxPos boxPos = SelectRandonBox(value);
+
+        if (boxPos != null)
+        {
+            WallDirection direction = GetRandomWall(boxPos);
+
+            if (direction != WallDirection.UNKNOWN)
+            {
+                gameMove = CreateMove(boxPos, direction);
+            }
+        }
+
+        return (gameMove);
+    }
+
     public BoxPos SelectRandonBox(int value)
     {
         BoxPosList boxPosList = new BoxPosList();

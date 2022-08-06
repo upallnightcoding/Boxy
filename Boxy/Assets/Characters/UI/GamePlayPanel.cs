@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.UI;
 
 public class GamePlayPanel : MonoBehaviour
 {
@@ -22,6 +23,9 @@ public class GamePlayPanel : MonoBehaviour
     [SerializeField] private TMP_Text message;
 
     [SerializeField] private TMP_Text gameLevel;
+
+    [SerializeField] private Button resignButton;
+    [SerializeField] private Button saveButton;
 
     private int squareCount = 0;
     private int boardSize = 0;
@@ -109,6 +113,8 @@ public class GamePlayPanel : MonoBehaviour
     public void CloseWinnerPanel()
     {
         winPanel.SetActive(false);
+        resignButton.enabled = true;
+        saveButton.enabled = true;
 
         StopGamePlay();
     }
@@ -132,6 +138,8 @@ public class GamePlayPanel : MonoBehaviour
             }
 
             winPanel.SetActive(true);
+            resignButton.enabled = false;
+            saveButton.enabled = false;
         }
     }
 }

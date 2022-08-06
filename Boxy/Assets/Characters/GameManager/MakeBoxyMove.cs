@@ -8,40 +8,40 @@ public class MakeBoxyMove : MonoBehaviour
 
     public GameMove MakeEasyMove(GameState gameState)
     {
-        GameMove gameMove = null;
-
-        BoxPos boxPos = gameLogic.SelectRandonBox(-1);
-
-        if (boxPos != null)
-        {
-            WallDirection direction = gameLogic.GetRandomWall(boxPos);
-
-            if (direction != WallDirection.UNKNOWN)
-            {
-                gameMove = gameLogic.CreateMove(boxPos, direction);
-            }
-        }
+        GameMove gameMove = gameLogic.MakeBoxyMove(-1);
 
         return (gameMove);
     }
 
     public GameMove MakeMediumMove(GameState gameState)
     {
-        GameMove gameMove = null;
+        GameMove gameMove = gameLogic.MakeBoxyMove(3);
 
-        BoxPos boxPos = gameLogic.SelectRandonBox(3);
-
-        if (boxPos != null)
-        {
-            WallDirection direction = gameLogic.GetRandomWall(boxPos);
-
-            if (direction != WallDirection.UNKNOWN)
-            {
-                gameMove = gameLogic.CreateMove(boxPos, direction);
-            }
-        } else
+        if (gameMove == null)
         {
             gameMove = MakeEasyMove(gameState);
+        }
+
+        return (gameMove);
+    }
+
+    public GameMove MakeHardMove(GameState gameState)
+    {
+        GameMove gameMove = gameLogic.MakeBoxyMove(3);
+
+        if (gameMove == null)
+        {
+            gameMove = gameLogic.MakeBoxyMove(0);
+
+            if (gameMove == null)
+            {
+                gameMove = gameLogic.MakeBoxyMove(1);
+
+                if (gameMove == null)
+                {
+                    gameMove = MakeEasyMove(gameState);
+                }
+            }
         }
 
         return (gameMove);

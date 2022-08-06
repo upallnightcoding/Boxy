@@ -20,7 +20,7 @@ public class GameData : ScriptableObject
     public void Initialize()
     {
         Player1Name = "Player1";
-        Player2Name = "Player2";
+        Player2Name = "Boxy";
 
         BoardSize = 3;
     }

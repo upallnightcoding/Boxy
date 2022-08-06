@@ -43,6 +43,7 @@ public class PlayerPanel : MonoBehaviour
         twoPlayerContainer.SetActive(false);
         gameObject.SetActive(true);
         gameData.mode = GameMode.ONE_PLAYER;
+        gameData.Player2Name = "Boxy";
     }
 
     public void TwoPlayerGame()
