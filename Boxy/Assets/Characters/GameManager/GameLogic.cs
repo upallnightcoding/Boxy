@@ -81,7 +81,7 @@ public class GameLogic : MonoBehaviour
 
         if (boxPos != null)
         {
-            WallDirection direction = GetRandomWall(boxPos);
+            WallDirection direction = GetRandomWall(boxPos, value);
 
             if (direction != WallDirection.UNKNOWN)
             {
@@ -224,20 +224,26 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    private void AddOneToWallCount(int col, int row, int boardSize, GameState gameState, bool loadMode, BoxPosList boxPosList)
+    private bool AddOneToWallCount(int col, int row, int boardSize, GameState gameState, bool loadMode, BoxPosList boxPosList)
     {
+        bool getAnotherTurn = false;
+
         if ((col >= 0) && (row >= 0) && (col < boardSize - 1) && (row < boardSize - 1))
         {
-            if (wall[col, row].Add() && !loadMode)
+            if (wall[col, row].AddAndCheckBox() && !loadMode)
             {
                 boxPosList.Add(col, row);
 
                 UpdateScore(col, row, gameState);
+
+                getAnotherTurn = true;
             }
         }
+
+        return (getAnotherTurn);
     }
 
-    public WallDirection GetRandomWall(BoxPos boxPos)
+    private WallDirection GetRandomWall(BoxPos boxPos, int value)
     {
         WallDirection direction = WallDirection.UNKNOWN;
         int col = boxPos.Col;
@@ -245,10 +251,10 @@ public class GameLogic : MonoBehaviour
 
         List<WallDirection> directions = new List<WallDirection>();
 
-        if (!pegBoard[col, row].North.IsLinked) directions.Add(WallDirection.WEST);
-        if (!pegBoard[col, row].East.IsLinked) directions.Add(WallDirection.SOUTH);
-        if (!pegBoard[col+1, row+1].West.IsLinked) directions.Add(WallDirection.NORTH);
-        if (!pegBoard[col+1, row+1].South.IsLinked) directions.Add(WallDirection.EAST);
+        if (!pegBoard[col, row].North.IsLinked && (!CheckForTwo(col - 1, row) || (value == 3))) directions.Add(WallDirection.WEST);
+        if (!pegBoard[col, row].East.IsLinked && (!CheckForTwo(col, row - 1) || (value == 3))) directions.Add(WallDirection.SOUTH);
+        if (!pegBoard[col+1, row+1].West.IsLinked && (!CheckForTwo(col, row + 1) || (value == 3))) directions.Add(WallDirection.NORTH);
+        if (!pegBoard[col+1, row+1].South.IsLinked && (!CheckForTwo(col + 1, row) || (value == 3))) directions.Add(WallDirection.EAST);
 
         if (directions.Count > 0)
         {
@@ -256,6 +262,17 @@ public class GameLogic : MonoBehaviour
         }
 
         return (direction);
+    }
+
+    private bool CheckForTwo(int col, int row)
+    {
+        return (
+            (col >= 0) && 
+            (row >= 0) && 
+            (col < boardSize-1) && 
+            (row < boardSize-1) && 
+            (wall[col, row].GetCount() == 2)
+        );
     }
 
     public GameMove CreateMove(BoxPos boxPos, WallDirection direction)

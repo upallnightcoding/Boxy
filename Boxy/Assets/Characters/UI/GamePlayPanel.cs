@@ -157,6 +157,7 @@ public class PlayerUI
         this.displayScore = displayScore;
 
         this.displayName.text = name;
+        this.displayScore.text = "0";
     }
 
     public void IncScore()

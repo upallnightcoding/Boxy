@@ -312,7 +312,7 @@ public class SquareBox
         };
     }
 
-    public bool Add()
+    public bool AddAndCheckBox()
     {
         return (++count >= 4);
     }
